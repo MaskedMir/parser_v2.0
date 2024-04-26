@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+    .processing-icon {
+        margin-left: 5px;
+    }
+    .parser-count {
+        font-size: 0.9em;
+        color: #888;
+        margin-left: 3px;
+    }
+    .green-check {
+        color: green;
+    }
+</style>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Парсер технологий компаний</title>
+</head>
+<body>
+    <h1>Парсер технологий компаний</h1>
+    <form action="/digsearch/toggle_parser" method="post">
+        <a id="parser-status">Парсер остановлен</a>
+        <button id="parser-button" type="submit">Запустить</button>
+        <span id="restart-icon" style="display: none;">⚠️</span>
+    </form>
+
+    <h2>Список компаний</h2>
+    <form action="/digsearch/add_company" method="post">
+        <input type="text" name="company_name" placeholder="Введите название компании">
+        <button type="submit">Добавить компанию</button>
+    </form>
+    <ul id="company-list">
+        {% for item in search_list %}
+            <li>
+                {{ item.company_name }}
+                {% set statuses = item.parser_statuses if item.parser_statuses is mapping else item.parser_statuses|fromjson %}
+                {% for parser, status in statuses.items() %}
+                    {% if status %}
+                        <span class="parser-icon green-check">✅</span>
+                        <span class="parser-names">{{ parser.upper() }}</span>
+                    {% endif %}
+                {% endfor %}
+                {% if item.active_parsers_count > 0 %}
+                    <span class="processing-icon">🔄</span>
+                    <span class="parser-count">{{ item.active_parsers_count }}</span>
+                {% endif %}
+                <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Список отраслей</h2>
+    <form action="/digsearch/add_industry" method="post">
+        <input type="text" name="industry_name" placeholder="Введите название отрасли">
+        <button type="submit">Добавить отрасль</button>
+    </form>
+    <ul id="company-list">
+        {% for item in industry_list %}
+            <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
+        {% endfor %}
+    </ul>
+
+    <h2>Список технологий</h2>
+    <form action="/digsearch/add_technology" method="post">
+        <input type="text" name="technology_name" placeholder="Введите название технологии">
+        <button type="submit">Добавить технологию</button>
+    </form>
+    <ul id="company-list">
+        {% for tech in technologies %}
+        <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
+        {% endfor %}
+    </ul>
+
+    <h2>Компании с доступными технологиями</h2>
+    <form action="/digsearch/show_technologies" method="post">
+        <select name="selected_company">
+            {% for company in companies %}
+                <option value="{{ company.name }}" {% if selected_company and company.name == selected_company %}selected{% endif %}>{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Отобразить">
+    </form>
+
+    {% if selected_company %}
+        <h2>Технологии для {{ selected_company }}</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Название технологии</th>
+                    <th>Дата</th>
+                    <th>Источник</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tech in company_technologies %}
+                    <tr>
+                        <td>{{ tech.technology }}</td>
+                        <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
+                        <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const eventSource = new EventSource('/digsearch/sse');
+
+    eventSource.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        // Обновляем текст кнопки в зависимости от состояния парсера
+        if (data.parser_running) {
+            document.getElementById("parser-status").innerText = "Парсер запущен";
+            document.getElementById("parser-button").innerText = "Остановить";
+        } else {
+            document.getElementById("parser-status").innerText = "Парсер остановлен";
+            document.getElementById("parser-button").innerText = "Запустить";
+        }
+
+        // Показываем или скрываем иконку перезапуска в зависимости от состояния флага
+        if (data.should_stop) {
+            document.getElementById("restart-icon").style.display = "inline";
+            document.getElementById("parser-button").disabled = true
+        } else {
+            document.getElementById("restart-icon").style.display = "none";
+            document.getElementById("parser-button").disabled = false
+        }
+
+        updateCompanies(data.company);
+    };
+
+    eventSource.onerror = function(error) {
+        console.error("SSE failed:", error);
+    };
+});
+
+function updateCompanies(data) {
+    const companyList = document.querySelector('#company-list');
+    companyList.innerHTML = "";  // clear the current list
+
+    data.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = item.company_name;
+
+        // Десериализация строки JSON в объект
+        const statuses = JSON.parse(item.parser_statuses) || {};
+
+        for (let parser in statuses) {
+            if (statuses[parser]) {
+                const parserIcon = document.createElement('span');
+                parserIcon.className = 'parser-icon';
+                parserIcon.textContent = '✅';
+                listItem.appendChild(parserIcon);
+
+                const parserName = document.createElement('span');
+                parserName.className = 'parser-names';
+                parserName.textContent = parser.toUpperCase();
+                listItem.appendChild(parserName);
+            }
+        }
+
+        if (item.active_parsers_count > 0) {
+            const icon = document.createElement('span');
+            icon.className = 'processing-icon';
+            icon.textContent = '🔄';
+            listItem.appendChild(icon);
+
+            const count = document.createElement('span');
+            count.className = 'parser-count';
+            count.textContent = item.active_parsers_count;
+            listItem.appendChild(count);
+        }
+
+        // Add the delete link for each company
+        const deleteLink = document.createElement('a');
+        deleteLink.href = `/digsearch/delete_company/${item.id}`;
+        deleteLink.textContent = ' Удалить';
+        listItem.appendChild(deleteLink);
+
+        companyList.appendChild(listItem);
+    });
+}
+</script>
+
+</body>
+</html>
