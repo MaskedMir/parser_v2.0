@@ -21,9 +21,27 @@ conn = MySQLdb.connect(
 cur = conn.cursor()
 cur.execute('SELECT version()')
 
+
+DB_USER = user1
+DB_SECRET = testpass
+DB_NAME = db_digsearch
+DB_HOST = rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net
+DB_PORT = 3306
+
+
 print(cur.fetchone()[0])
 
 conn.close()
+
+# db = PooledMySQLDatabase(
+#     DB_NAME,
+#     user=DB_USER,
+#     password=DB_SECRET,
+#     host=DB_HOST,
+#     max_connections=10,  # максимальное количество соединений в пуле
+#     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
+#     ssl = {'ca': 'database/MySQL.pem'}
+# )
 
 db = PooledMySQLDatabase(
     DB_NAME,
