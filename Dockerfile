@@ -26,7 +26,8 @@ FROM python:3.12
 WORKDIR /app
 
 ADD . /app
-
+RUN pip install --only-binary :all: greenlet
+RUN pip install --only-binary :all: Flask-SQLAlchemy
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "-u",  "./project/main.py"]
