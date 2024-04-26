@@ -413,7 +413,7 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="127.0.0.1", port=3306)
+    uvicorn.run(app, host="0.0.0.0", port=3306)
 
 
 app.include_router(router)
