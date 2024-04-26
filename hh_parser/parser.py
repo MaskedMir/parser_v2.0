@@ -1,8 +1,9 @@
 import gc
 import re
+import playwright
 
 from datetime import datetime, date
-from project.base_parser import BaseParser
+from base_parser import BaseParser
 from bs4 import BeautifulSoup
 from database import Resume, Vacancy, Company
 from shared import should_stop

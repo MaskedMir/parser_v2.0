@@ -1,7 +1,7 @@
 import gc
 import re
 
-from project.base_parser import BaseParser
+from base_parser import BaseParser
 from bs4 import BeautifulSoup
 from database import Passport, Project, Company, Product
 from datetime import datetime
