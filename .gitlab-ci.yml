@@ -1,0 +1,65 @@
+stages:
+  - build
+  - deploy
+  - logs
+
+variables:
+  REGISTRY: planetra.gitlab.yandexcloud.net:5050
+  IMAGE_NAME: testgroup/$CI_PROJECT_NAME
+
+
+build:
+  image: docker:stable
+  stage: build
+  when: manual
+  services:
+    - name: docker:stable-dind
+      alias: docker
+  before_script:
+    - echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin
+  script:
+    - docker build --tag $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG .
+    - docker build --tag $REGISTRY/$IMAGE_NAME:latest .
+    - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG
+    - docker push $REGISTRY/$IMAGE_NAME:latest
+  tags:
+    - docker
+
+
+
+
+deploy:
+  image: ubuntu:latest
+  stage: deploy
+  needs: ["build"]
+  # dependencies: 
+  #   - build
+  when: manual
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SSH_HOST "echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin && cd $WORK_DIR &&  docker compose pull && docker-compose up  --force-recreate -d && exit"
+  tags:
+    - docker
+
+logs:
+  image: ubuntu:latest
+  stage: logs
+  needs: ["build", "deploy"]
+  # dependencies: 
+  #   - build
+  #   - deploy
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SSH_HOST "docker logs -f $CI_PROJECT_NAME"
+  tags:
+    - docker
