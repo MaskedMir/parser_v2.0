@@ -22,10 +22,10 @@ cur = conn.cursor()
 cur.execute('SELECT version()')
 
 
-DB_USER = user1
-DB_SECRET = testpass
-DB_NAME = db_digsearch
-DB_HOST = rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net
+DB_USER = "user1"
+DB_SECRET = "testpass"
+DB_NAME = "db_digsearch"
+DB_HOST = "rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net"
 DB_PORT = 3306
 
 
