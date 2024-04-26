@@ -1,7 +1,6 @@
 playwright==1.37.0
 playwright_stealth~=1.0.5
 beautifulsoup4==4.12.2
-peewee==3.16.3
 mysql~=0.0.3
 pymysql~=1.1.0
 requests~=2.31.0
