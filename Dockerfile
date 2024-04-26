@@ -1,8 +1,13 @@
-FROM mcr.microsoft.com/playwright/python:v1.37.0-jammy
+#FROM mcr.microsoft.com/playwright/python:v1.37.0-jammy
 
-ARG DOCKER_APP_PATH
+#ARG DOCKER_APP_PATH
+#
+#WORKDIR $DOCKER_APP_PATH
+FROM python:3.12
 
-WORKDIR $DOCKER_APP_PATH
+WORKDIR /app
+
+ADD . /app
 
 COPY requirements.txt .
 COPY main.py .
@@ -21,9 +26,9 @@ COPY tadv_parser ./tadv_parser
 RUN mkdir -p ./templates
 COPY templates ./templates
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        pkg-config libmysqlclient-dev build-essential python3-dev bash
+#RUN apt-get update && apt-get install -y --no-install-recommends \
+#        pkg-config libmysqlclient-dev build-essential python3-dev bash
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "main.py"]
+CMD ["python", "-u", "main.py"]
