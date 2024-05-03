@@ -176,6 +176,10 @@ class SearchCompany(BaseModel):
     active_parsers_count = IntegerField(default=0)
     parser_statuses = TextField(default="{}")
 
+class HHCompanyList(BaseModel):
+    name = TextField(unique=True)
+    url = TextField()
+
 
 # Create the tables in the database
 db.connect()
