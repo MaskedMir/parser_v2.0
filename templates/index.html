@@ -68,10 +68,10 @@
 
 <h2>Список компаний</h2>
 <form action="/digsearch/add_company" method="post">
-    <input type="text" class="search-input" placeholder="Search.." oninput="updateDropdown(this.value)">
+    <input type="text" name="company_name" class="search-input" placeholder="Введите название компании.." oninput="updateDropdown(this.value)">
     <div class="search-dropdown" id="dropdown"></div>
 {#    <input type="text" name="company_name" placeholder="Введите название компании">#}
-{#    <button type="submit">Добавить компанию</button>#}
+    <button type="submit">Добавить компанию</button>
 </form>
 <ul id="company-list">
     {% for item in search_list %}
@@ -191,9 +191,8 @@
         // Здесь должен быть код для отправки значения в базу данных
         console.log('Sending to database:', value);
     }
-</script>
 
-<script>
+
     document.addEventListener("DOMContentLoaded", function () {
         const eventSource = new EventSource('/digsearch/sse');
 
