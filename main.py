@@ -7,7 +7,7 @@ import uvicorn
 import json
 
 from playwright.async_api import async_playwright
-from hh_parser import HeadHunterParser, HeadHunterParserCompany
+from hh_parser import HeadHunterParser
 from tadv_parser import TadViserParser
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db
@@ -235,66 +235,6 @@ def show_technologies_all_fields(company_id):
 
     return sorted_data
 
-async def start_hh_parsing_com(browser):
-    print("start_hh_parsing_com")
-    hh_parser = HeadHunterParserCompany(browser)
-
-    page = await hh_parser.get_new_page()
-
-    companies_from_search = []
-    for search_item in SearchCompany.select():
-        if should_stop.is_set():
-            companies_from_search = []
-            break
-
-        company_url = await hh_parser.find_company_url(page, search_item.company_name)
-        if company_url:
-            companies_from_search.append({"url": company_url, "name": search_item.company_name})
-
-    await page.close()
-
-    combined_list = companies_from_search
-
-    # Убираем дубликаты на основе URL
-    seen = set()
-    all_unique_companies = []
-    for company in combined_list:
-        if should_stop.is_set():
-            all_unique_companies = []
-            break
-
-        if isinstance(company, dict):  # Если это словарь, берем URL
-            url = company["url"]
-        else:  # Если это строка, просто используем ее
-            url = company
-
-        if url not in seen:
-            seen.add(url)
-            all_unique_companies.append(company)
-
-    for company_url in all_unique_companies:
-        print(company_url)
-        if should_stop.is_set():
-            break
-
-        # Находим компанию в базе данных и увеличиваем счетчик
-        company = None
-        try:
-            company = SearchCompany.get(SearchCompany.company_name == company_url["name"])
-        except SearchCompany.DoesNotExist:
-            pass
-
-        if company:
-            company.active_parsers_count += 1
-            company.save()
-
-        await hh_parser.parse(company_url["name"], company_url["url"])
-
-        try:
-            company = SearchCompany.get(SearchCompany.company_name == company_url["name"])
-        except SearchCompany.DoesNotExist:
-            pass
-
 async def start_hh_parsing(browser):
     print("start_hh_parsing")
     hh_parser = HeadHunterParser(browser)
@@ -465,7 +405,7 @@ async def run_parsers():
             company.parser_statuses = {}
             company.save()
 
-        await asyncio.gather(start_hh_parsing(browser), start_tv_parsing(browser), start_hh_parsing_com(browser))
+        await asyncio.gather(start_hh_parsing(browser), start_tv_parsing(browser))
         await browser.close()
 
         parser_running = False
