@@ -102,6 +102,4 @@ def generate_url():
                     link_parser(result_url)
 
 
-if __name__ == '__main__':
-    generate_url()
 
