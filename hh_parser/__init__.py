@@ -1,2 +1,1 @@
 from .parser import HeadHunterParser
-from .parse_company_hh import HeadHunterParserCompany
