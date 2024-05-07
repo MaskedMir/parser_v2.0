@@ -50,7 +50,7 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl = {'ca': 'database/MySQL.pem'}
+    ssl={'ca': 'database/MySQL.pem'}
 )
 
 
@@ -177,10 +177,14 @@ class SearchCompany(BaseModel):
     parser_statuses = TextField(default="{}")
 
 
+class HHCompanyList(BaseModel):
+    name = TextField(unique=True)
+
+
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompanyList])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0

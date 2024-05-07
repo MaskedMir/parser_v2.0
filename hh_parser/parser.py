@@ -7,7 +7,7 @@ from base_parser import BaseParser
 from bs4 import BeautifulSoup
 from database import Resume, Vacancy, Company
 from shared import should_stop
-from playwright._impl._api_types import TimeoutError
+# from playwright._impl._api_types import TimeoutError
 
 
 should_continue = True

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Box with Dropdown List</title>
+<style>
+  .search-container {
+    position: relative;
+    width: 300px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-sizing: border-box;
+    display: none;
+  }
+
+  .search-dropdown-item {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .search-dropdown-item:hover {
+    background-color: #ddd;
+  }
+</style>
+</head>
+<body>
+
+<div class="search-container">
+  <input type="text" class="search-input" placeholder="Search.." oninput="updateDropdown(this.value)">
+  <div class="search-dropdown" id="dropdown"></div>
+</div>
+
+<script>
+// Пример массива данных для выпадающего списка
+var data = ["Option 1", "Option 2", "Option 3"];
+
+function updateDropdown(value) {
+  var dropdown = document.querySelector('.search-dropdown');
+  dropdown.innerHTML = ''; // Очищаем выпадающий список
+
+  // Фильтруем массив данных в соответствии с введенным значением
+  var filteredData = data.filter(function(item) {
+    return item.toLowerCase().includes(value.toLowerCase());
+  });
+
+  // Создаем элементы списка и добавляем их в выпадающий список
+  filteredData.forEach(function(item) {
+    var listItem = document.createElement('div');
+    listItem.textContent = item;
+    listItem.classList.add('search-dropdown-item');
+    listItem.onclick = function() { selectItem(item); };
+    dropdown.appendChild(listItem);
+  });
+
+  dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
+
+  // Отправляем введенный символ в базу данных
+  sendToDatabase(value);
+}
+
+function selectItem(value) {
+  var input = document.querySelector('.search-input');
+  input.value = value;
+  document.querySelector('.search-dropdown').style.display = 'none';
+
+  // Отправляем выбранный элемент в базу данных
+  sendToDatabase(value);
+}
+
+function sendToDatabase(value) {
+  // Здесь должен быть код для отправки значения в базу данных
+  console.log('Sending to database:', value);
+}
+</script>
+
+</body>
+</html>

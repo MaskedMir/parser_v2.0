@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from database import Passport, Project, Company, Product
 from datetime import datetime
 from shared import should_stop
-from playwright._impl._api_types import TimeoutError
+# from playwright._impl._api_types import TimeoutError
 
 
 def clean_url_string(s):
