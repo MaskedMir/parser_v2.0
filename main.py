@@ -413,14 +413,14 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="52.250.87.87", port=3306)
+    uvicorn.run(app, host="51.250.87.87", port=3306)
 
 
 app.include_router(router)
 templates.env.filters["fromjson"] = fromjson
 
 if __name__ == '__main__':
-    generate_url()
+    # generate_url()
     server_thread = threading.Thread(target=start_server)
     server_thread.start()
 
