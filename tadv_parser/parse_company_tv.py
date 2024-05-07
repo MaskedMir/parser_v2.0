@@ -84,9 +84,8 @@ def generate_url():
             k += 1
             print(k)
         else:
-            break
+            continue
 
 
 if __name__ == '__main__':
     generate_url()
-    

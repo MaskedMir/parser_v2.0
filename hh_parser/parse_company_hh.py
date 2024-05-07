@@ -2,17 +2,16 @@ from bs4 import BeautifulSoup
 import requests
 from database import HHCompanyList
 
-
-def link_parser(url):
-    try:
-        # url = "https://hh.ru/employers_list?page=2" #
-        headers = {
+HEADERS = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
                             AppleWebKit/537.36 (KHTML, like Gecko)\
                              Chrome/58.0.3029.110 Safari/537.3'
         }
 
-        response = requests.get(url, headers=headers)
+
+def link_parser(url):
+    try:
+        response = requests.get(url, headers=HEADERS)
         soup = BeautifulSoup(response.content, 'html.parser')
 
         companies_table = soup.select_one(
@@ -66,16 +65,11 @@ def generate_url():
     Returns:
     """
     base_url = "https://hh.ru/employers_list?query=&hhtmFrom=employers_list&hhtmFromLabel=employer_search_line"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
-                                AppleWebKit/537.36 (KHTML, like Gecko)\
-                                 Chrome/58.0.3029.110 Safari/537.3'
-    }
     k = 0
     letters = get_alphabet()
     for city in range(1, 15001):
         _url = base_url + "&areaId=" + str(city)
-        response = requests.get(_url, headers=headers)
+        response = requests.get(_url, headers=HEADERS)
         soup = BeautifulSoup(response.content, 'html.parser')
         count_class = soup.find('div', class_='totals--rE1moq2jhLukW5QVcI6L')
         count_span = count_class.find('span', class_='bloko-text_strong')
@@ -93,10 +87,16 @@ def generate_url():
                             k += 1
                             print(k)
                         else:
-                            break
+                            continue
 
             else:
                 for page in range(0, 50):
                     result_url = base_url + "&areaId=" + str(city) + "&page=" + str(page)
-                    print(_url)
-                    link_parser(result_url)
+                    _temp = link_parser(result_url)
+                    if _temp:
+                        for name in _temp:
+                            HHCompanyList.create(name=name)
+                        k += 1
+                        print(k)
+                    else:
+                        continue
