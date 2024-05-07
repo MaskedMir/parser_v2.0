@@ -100,6 +100,3 @@ def generate_url():
                     result_url = base_url + "&areaId=" + str(city) + "&page=" + str(page)
                     print(_url)
                     link_parser(result_url)
-
-
-

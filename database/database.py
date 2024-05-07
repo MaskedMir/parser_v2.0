@@ -16,7 +16,9 @@ conn = MySQLdb.connect(
       db="db_digsearch",
       user="user1",
       passwd="testpass",
-      ssl={'ca': 'database/MySQL.pem'})
+      ssl={'ca': 'database/MySQL.pem'}
+      # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+    )
 
 cur = conn.cursor()
 cur.execute('SELECT version()')
@@ -51,6 +53,7 @@ db = PooledMySQLDatabase(
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
     ssl={'ca': 'database/MySQL.pem'}
+    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
 
@@ -181,10 +184,14 @@ class HHCompanyList(BaseModel):
     name = TextField(unique=True)
 
 
+class tvcomplist(BaseModel):
+    name = TextField(unique=True)
+
+
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompanyList])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompanyList, tvcomplist])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0
