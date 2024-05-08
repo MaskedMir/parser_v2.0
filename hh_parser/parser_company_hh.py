@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 from database import HHCompanyList
+from time import time
 
 HEADERS = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
@@ -18,17 +19,15 @@ def link_parser(url):
             'div.bloko-column.bloko-column_container.bloko-column_xs-4.bloko-column_m-8.bloko-column_l-11 table tbody'
         )
         companies = companies_table.find_all('div')
-        print(url)
+        print(f'[INFO] {url}')
         result = []
         for company in companies:
             name_element = company.select_one('div.bloko-link')
             name = name_element.text.strip() if name_element else company.select_one('a').text.strip()
-            # vacancies = company.select_one('td span').text.strip()
-            # print("Company:", name)
             result.append(name)
         return result
     except Exception as e:
-        print(e)
+        print(f'[ERROR] {e}')
         return False
 
 
@@ -67,36 +66,57 @@ def generate_url():
     base_url = "https://hh.ru/employers_list?query=&hhtmFrom=employers_list&hhtmFromLabel=employer_search_line"
     k = 0
     letters = get_alphabet()
-    for city in range(1, 15001):
+
+    with open("region.txt", "r") as file:
+        # Читаем все строки из файла и удаляем символы новой строки (\n)
+        lines = [line.strip() for line in file]
+
+    for city in lines:
         _url = base_url + "&areaId=" + str(city)
         response = requests.get(_url, headers=HEADERS)
         soup = BeautifulSoup(response.content, 'html.parser')
         count_class = soup.find('div', class_='totals--rE1moq2jhLukW5QVcI6L')
         count_span = count_class.find('span', class_='bloko-text_strong')
         _count = count_span.text.strip()
-        print(_count)
+        print(f'[INFO] {_count} компаний в городе')
         if int(_count) > 0:
             if int(_count) > 5000:
                 for letter in letters:
                     for page in range(0, 50):
+                        start_time = time()
                         result_url = base_url + "&areaId=" + str(city) + letter + "&page=" + str(page)
                         _temp = link_parser(result_url)
                         if _temp:
                             for name in _temp:
                                 HHCompanyList.create(name=name)
+                                # print(name)
+                                pass
                             k += 1
-                            print(k)
+                            print(f'[INFO] ~{k*100} строк')
                         else:
-                            continue
+                            break
+                        end_time = time()
+                        print(f'[INFO] {round(end_time - start_time, 3)} sec')
 
             else:
                 for page in range(0, 50):
+                    start_time = time()
                     result_url = base_url + "&areaId=" + str(city) + "&page=" + str(page)
                     _temp = link_parser(result_url)
                     if _temp:
                         for name in _temp:
                             HHCompanyList.create(name=name)
+                            # print(name)
+                            pass
                         k += 1
-                        print(k)
+                        print(f'[INFO] ~{k*100} строк')
                     else:
-                        continue
+                        break
+                    end_time = time()
+                    print(f'[INFO] {round(end_time - start_time, 3)} sec')
+
+
+if __name__ == '__main__':
+
+    generate_url()
+
