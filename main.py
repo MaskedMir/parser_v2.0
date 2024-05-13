@@ -5,6 +5,7 @@ import asyncio
 import re
 import uvicorn
 import json
+import MySQLdb
 
 from playwright.async_api import async_playwright
 from hh_parser import HeadHunterParser
@@ -32,6 +33,16 @@ def fromjson(value):
     except json.JSONDecodeError:
         return {}
 
+def create_connection():
+    conn = MySQLdb.connect(
+        host="rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net",
+        port=3306,
+        db="db_digsearch",
+        user="user1",
+        passwd="testpass",
+        ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+    )
+    return conn
 
 @router.get('/')
 def index(request: Request):
@@ -167,6 +178,58 @@ async def toggle_parser():
         should_restart = True
 
     return RedirectResponse(url="/digsearch/", status_code=303)
+
+
+@router.get("/employees")
+def get_employees(request: Request):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name FROM hhcomplist")
+    employees = cursor.fetchall()
+    conn.close()
+    return templates.TemplateResponse("index.html", {"request": request, "employees": employees})
+
+@router.get("/employees/{id}")
+def get_employee(id: int):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM hhcomplist WHERE id = %s", (id,))
+    employee = cursor.fetchone()
+    conn.close()
+    if employee:
+        return {"employee": employee}
+    else:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+@router.post("/employees")
+def add_employee(name: str, id: int):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO hhcomplist (name, id) VALUES (%s, %s)", (name, id))
+    conn.commit()
+    conn.close()
+    return {"message": "Employee added successfully"}
+
+@router.delete("/employees/{id}")
+def delete_employee(id: int):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM hhcomplist WHERE id = %s", (id,))
+    conn.commit()
+    conn.close()
+    return {"message": "Employee deleted successfully"}
+
+@router.get("/autocomplete")
+async def autocomplete(query: str):
+    conn = create_connection()
+    cursor = conn.cursor()
+    query = f"%{query}%"
+    cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
+    names = cursor.fetchall()
+    conn.close()
+    return {"matches": [names[name][0] for name in range(5)]}
+
+
 
 
 def search_for_technologies(text, technologies):
@@ -413,8 +476,8 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="51.250.87.87", port=3306)
-
+    # uvicorn.run(app, host="0.0.0.0", port=3306)
+    uvicorn.run(app, host="127.0.0.1", port=3306)
 
 app.include_router(router)
 templates.env.filters["fromjson"] = fromjson

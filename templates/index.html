@@ -16,40 +16,30 @@
             color: green;
         }
 
-        .search-container {
-            position: relative;
-            width: 300px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .search-dropdown {
+        #autocomplete-list {
             position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
             top: 100%;
             left: 0;
-            width: 100%;
-            z-index: 1;
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            box-sizing: border-box;
-            display: none;
+            right: 0;
         }
 
-        .search-dropdown-item {
-            padding: 8px;
+        #autocomplete-list div {
+            padding: 10px;
             cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
         }
 
-        .search-dropdown-item:hover {
-            background-color: #ddd;
+        #autocomplete-list div:hover {
+            background-color: #e9e9e9;
+        }
+
+        #search-results {
+            margin-top: 20px;
         }
     </style>
 
@@ -67,29 +57,29 @@
 </form>
 
 <h2>Список компаний</h2>
-<form action="/digsearch/add_company" method="post">
-    <input type="text" name="company_name" class="search-input" placeholder="Введите название компании.." oninput="updateDropdown(this.value)">
-    <div class="search-dropdown" id="dropdown"></div>
-{#    <input type="text" name="company_name" placeholder="Введите название компании">#}
-    <button type="submit">Добавить компанию</button>
-</form>
+
+<input type="text" id="searchInput" placeholder="Введите имя компании" autocomplete="off">
+<button onclick="searchEmployees()">Search</button>
+<div id="autocomplete-list"></div>
+<div id="search-results"></div>
+
 <ul id="company-list">
     {% for item in search_list %}
-        <li>
-            {{ item.company_name }}
-            {% set statuses = item.parser_statuses if item.parser_statuses is mapping else item.parser_statuses|fromjson %}
-            {% for parser, status in statuses.items() %}
-                {% if status %}
-                    <span class="parser-icon green-check">✅</span>
-                    <span class="parser-names">{{ parser.upper() }}</span>
-                {% endif %}
-            {% endfor %}
-            {% if item.active_parsers_count > 0 %}
-                <span class="processing-icon">🔄</span>
-                <span class="parser-count">{{ item.active_parsers_count }}</span>
-            {% endif %}
-            <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
-        </li>
+    <li>
+        {{ item.company_name }}
+        {% set statuses = item.parser_statuses if item.parser_statuses is mapping else item.parser_statuses|fromjson %}
+        {% for parser, status in statuses.items() %}
+        {% if status %}
+        <span class="parser-icon green-check">✅</span>
+        <span class="parser-names">{{ parser.upper() }}</span>
+        {% endif %}
+        {% endfor %}
+        {% if item.active_parsers_count > 0 %}
+        <span class="processing-icon">🔄</span>
+        <span class="parser-count">{{ item.active_parsers_count }}</span>
+        {% endif %}
+        <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
+    </li>
     {% endfor %}
 </ul>
 
@@ -100,7 +90,7 @@
 </form>
 <ul id="company-list">
     {% for item in industry_list %}
-        <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
+    <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
     {% endfor %}
 </ul>
 
@@ -111,7 +101,7 @@
 </form>
 <ul id="company-list">
     {% for tech in technologies %}
-        <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
+    <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
     {% endfor %}
 </ul>
 
@@ -119,38 +109,39 @@
 <form action="/digsearch/show_technologies" method="post">
     <select name="selected_company">
         {% for company in companies %}
-            <option value="{{ company.name }}"
-                    {% if selected_company and company.name == selected_company %}selected{% endif %}>{{ company.name }}</option>
+        <option value="{{ company.name }}"
+                {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name }}
+        </option>
         {% endfor %}
     </select>
     <input type="submit" value="Отобразить">
 </form>
 
 {% if selected_company %}
-    <h2>Технологии для {{ selected_company }}</h2>
-    <table border="1">
-        <thead>
-        <tr>
-            <th>Название технологии</th>
-            <th>Дата</th>
-            <th>Источник</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for tech in company_technologies %}
-            <tr>
-                <td>{{ tech.technology }}</td>
-                <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
-                <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<h2>Технологии для {{ selected_company }}</h2>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Название технологии</th>
+        <th>Дата</th>
+        <th>Источник</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for tech in company_technologies %}
+    <tr>
+        <td>{{ tech.technology }}</td>
+        <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
+        <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 
 <script>
-    // Пример массива данных для выпадающего списка
-    var data = ["Option 1", "Option 2", "Option 3"];
+
+    var complist = [];
 
     function updateDropdown(value) {
         var dropdown = document.querySelector('.search-dropdown');
@@ -177,6 +168,55 @@
         // Отправляем введенный символ в базу данных
         sendToDatabase(value);
     }
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const input = this.value;
+        if (!input) {
+            document.getElementById('autocomplete-list').innerHTML = '';
+            return;
+        }
+        fetch(`/digsearch/autocomplete?query=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                const autocompleteList = document.getElementById('autocomplete-list');
+                autocompleteList.innerHTML = '';
+                data.matches.forEach(function (item) {
+                    // let div = document.createElement('div');
+                    // div.textContent = item;
+                    // div.addEventListener('click', function() {
+                    //     document.getElementById('searchInput').value = this.textContent;
+                    //     autocompleteList.innerHTML = '';
+                    //     searchEmployees();
+                    // });
+                    // autocompleteList.appendChild(div);
+                    complist.push(item)
+                });
+            });
+    });
+
+    function searchEmployees() {
+        const name = document.getElementById('searchInput').value;
+        fetch(`/digsearch/employees/${name}`)
+            .then(response => response.json())
+            .then(data => {
+                const results = document.getElementById('search-results');
+                results.innerHTML = '';
+                if (data.employee) {
+                    results.innerHTML = `<p>Name: ${data.employee.name} - ID: ${data.employee.id}</p>`;
+                } else {
+                    results.innerHTML = '<p>No employee found.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                results.innerHTML = '<p>Error fetching data.</p>';
+            });
+    }
+</script>
+
+
+<script>
+    // Пример массива данных для выпадающего списка
 
     function selectItem(value) {
         var input = document.querySelector('.search-input');
@@ -271,6 +311,31 @@
             companyList.appendChild(listItem);
         });
     }
+
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+        let input = this.value;
+        if (!input) {
+            document.getElementById('autocomplete-list').innerHTML = '';
+            return;
+        }
+        fetch(`/digsearch/autocomplete?query=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                let autocompleteResults = document.getElementById('autocomplete-list');
+                autocompleteResults.innerHTML = '';
+                data.matches.forEach(function (item) {
+                    let div = document.createElement('div');
+                    div.innerHTML = item;
+                    div.addEventListener('click', function () {
+                        document.getElementById('searchInput').value = this.innerText;
+                        autocompleteResults.innerHTML = '';
+                    });
+                    autocompleteResults.appendChild(div);
+                });
+            });
+    });
+
 </script>
 
 </body>
