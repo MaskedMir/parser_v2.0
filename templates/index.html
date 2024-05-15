@@ -22,9 +22,14 @@
             border-bottom: none;
             border-top: none;
             z-index: 99;
-            top: 100%;
+            top: 30px;
             left: 0;
-            right: 0;
+            width: 100%;
+        }
+
+        .autocomplete-list--disable {
+            display: none;
+            overflow: hidden;
         }
 
         #autocomplete-list div {
@@ -40,6 +45,12 @@
 
         #search-results {
             margin-top: 20px;
+        }
+
+        .list-of-companies {
+            border: none;
+            position: relative;
+            padding: 0;
         }
     </style>
 
@@ -58,11 +69,13 @@
 
 <h2>Список компаний</h2>
 <form action="/digsearch/add_company" method="post">
-    <input type="text" id="searchInput"  autocomplete="off"
+    <fieldset class="list-of-companies">
+        <input type="text" id="searchInput"  autocomplete="off"
            name="company_name" class="search-input" placeholder="Введите название компании..">
-    <div id="autocomplete-list"></div>
-    <button type="submit" onclick="searchEmployees()">найти</button>
-    <div id="search-results"></div>
+        <div id="autocomplete-list"></div>
+        <button type="submit" onclick="searchEmployees()">найти</button>
+        <div id="search-results"></div>
+    </fieldset>
 </form>
 <ul id="company-list">
     {% for item in search_list %}
@@ -141,7 +154,15 @@
 {% endif %}
 
 <script>
-    document.getElementById('searchInput').addEventListener('input', function () {
+
+    const autocompleteList = document.getElementById('autocomplete-list');
+    const searchInput = document.getElementById('searchInput');
+
+     searchInput.addEventListener('click', function () {
+         autocompleteList.classList.remove('autocomplete-list--disable');
+     })
+
+    searchInput.addEventListener('input', function () {
         const input = this.value;
         if (!input) {
             document.getElementById('autocomplete-list').innerHTML = '';
@@ -150,10 +171,11 @@
         fetch(`/digsearch/autocomplete?query=${input}`)
             .then(response => response.json())
             .then(data => {
-                const autocompleteList = document.getElementById('autocomplete-list');
+                autocompleteList.classList.remove('autocomplete-list--disable');
                 autocompleteList.innerHTML = '';
                 data.matches.forEach(function (item) {
                     const div = document.createElement('div');
+                    div.classList.add('autocomplete-list__item')
                     div.textContent = item;
                     div.addEventListener('click', function() {
                         document.getElementById('searchInput').value = this.textContent;
@@ -164,6 +186,15 @@
                 });
             });
     });
+
+     document.addEventListener('click', function (event) {
+         if (event.target.className !== 'search-input' &&
+             event.target.type !== 'submit' &&
+             event.target.className !== 'autocomplete-list__item'
+         ) {
+             autocompleteList.classList.add('autocomplete-list--disable')
+         }
+     });
 
     function searchEmployees() {
         const name = document.getElementById('searchInput').value;
@@ -265,6 +296,7 @@
             companyList.appendChild(listItem);
         });
     }
+
 </script>
 
 </body>
