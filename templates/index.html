@@ -57,12 +57,13 @@
 </form>
 
 <h2>Список компаний</h2>
-
-<input type="text" id="searchInput" placeholder="Введите имя компании" autocomplete="off">
-<button onclick="searchEmployees()">Search</button>
-<div id="autocomplete-list"></div>
-<div id="search-results"></div>
-
+<form action="/digsearch/add_company" method="post">
+    <input type="text" id="searchInput"  autocomplete="off"
+           name="company_name" class="search-input" placeholder="Введите название компании..">
+    <div id="autocomplete-list"></div>
+    <button type="submit" onclick="searchEmployees()">найти</button>
+    <div id="search-results"></div>
+</form>
 <ul id="company-list">
     {% for item in search_list %}
     <li>
@@ -88,7 +89,7 @@
     <input type="text" name="industry_name" placeholder="Введите название отрасли">
     <button type="submit">Добавить отрасль</button>
 </form>
-<ul id="company-list">
+<ul id="industry-list">
     {% for item in industry_list %}
     <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
     {% endfor %}
@@ -99,7 +100,7 @@
     <input type="text" name="technology_name" placeholder="Введите название технологии">
     <button type="submit">Добавить технологию</button>
 </form>
-<ul id="company-list">
+<ul id="technology-list">
     {% for tech in technologies %}
     <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
     {% endfor %}
@@ -110,7 +111,7 @@
     <select name="selected_company">
         {% for company in companies %}
         <option value="{{ company.name }}"
-                {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name }}
+                {% if selected_company and company.name == selected_company %}selected{% endif %}>{{ company.name }}
         </option>
         {% endfor %}
     </select>
@@ -140,35 +141,6 @@
 {% endif %}
 
 <script>
-
-    var complist = [];
-
-    function updateDropdown(value) {
-        var dropdown = document.querySelector('.search-dropdown');
-        dropdown.innerHTML = ''; // Очищаем выпадающий список
-
-        // Фильтруем массив данных в соответствии с введенным значением
-        var filteredData = data.filter(function (item) {
-            return item.toLowerCase().includes(value.toLowerCase());
-        });
-
-        // Создаем элементы списка и добавляем их в выпадающий список
-        filteredData.forEach(function (item) {
-            var listItem = document.createElement('div');
-            listItem.textContent = item;
-            listItem.classList.add('search-dropdown-item');
-            listItem.onclick = function () {
-                selectItem(item);
-            };
-            dropdown.appendChild(listItem);
-        });
-
-        dropdown.style.display = filteredData.length > 0 ? 'block' : 'none';
-
-        // Отправляем введенный символ в базу данных
-        sendToDatabase(value);
-    }
-
     document.getElementById('searchInput').addEventListener('input', function () {
         const input = this.value;
         if (!input) {
@@ -181,15 +153,14 @@
                 const autocompleteList = document.getElementById('autocomplete-list');
                 autocompleteList.innerHTML = '';
                 data.matches.forEach(function (item) {
-                    // let div = document.createElement('div');
-                    // div.textContent = item;
-                    // div.addEventListener('click', function() {
-                    //     document.getElementById('searchInput').value = this.textContent;
-                    //     autocompleteList.innerHTML = '';
-                    //     searchEmployees();
-                    // });
-                    // autocompleteList.appendChild(div);
-                    complist.push(item)
+                    const div = document.createElement('div');
+                    div.textContent = item;
+                    div.addEventListener('click', function() {
+                        document.getElementById('searchInput').value = this.textContent;
+                        autocompleteList.innerHTML = '';
+                        searchEmployees();
+                    });
+                    autocompleteList.appendChild(div);
                 });
             });
     });
@@ -209,29 +180,16 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+                const results = document.getElementById('search-results');
                 results.innerHTML = '<p>Error fetching data.</p>';
             });
     }
-</script>
-
-
-<script>
-    // Пример массива данных для выпадающего списка
 
     function selectItem(value) {
-        var input = document.querySelector('.search-input');
+        const input = document.querySelector('.search-input');
         input.value = value;
-        document.querySelector('.search-dropdown').style.display = 'none';
-
-        // Отправляем выбранный элемент в базу данных
-        sendToDatabase(value);
+        document.getElementById('autocomplete-list').style.display = 'none';
     }
-
-    function sendToDatabase(value) {
-        // Здесь должен быть код для отправки значения в базу данных
-        console.log('Sending to database:', value);
-    }
-
 
     document.addEventListener("DOMContentLoaded", function () {
         const eventSource = new EventSource('/digsearch/sse');
@@ -239,7 +197,6 @@
         eventSource.onmessage = function (event) {
             const data = JSON.parse(event.data);
 
-            // Обновляем текст кнопки в зависимости от состояния парсера
             if (data.parser_running) {
                 document.getElementById("parser-status").innerText = "Парсер запущен";
                 document.getElementById("parser-button").innerText = "Остановить";
@@ -248,13 +205,12 @@
                 document.getElementById("parser-button").innerText = "Запустить";
             }
 
-            // Показываем или скрываем иконку перезапуска в зависимости от состояния флага
             if (data.should_stop) {
                 document.getElementById("restart-icon").style.display = "inline";
-                document.getElementById("parser-button").disabled = true
+                document.getElementById("parser-button").disabled = true;
             } else {
                 document.getElementById("restart-icon").style.display = "none";
-                document.getElementById("parser-button").disabled = false
+                document.getElementById("parser-button").disabled = false;
             }
 
             updateCompanies(data.company);
@@ -267,19 +223,18 @@
 
     function updateCompanies(data) {
         const companyList = document.querySelector('#company-list');
-        companyList.innerHTML = "";  // clear the current list
+        companyList.innerHTML = "";
 
         data.forEach(item => {
             const listItem = document.createElement('li');
             listItem.innerHTML = item.company_name;
 
-            // Десериализация строки JSON в объект
             const statuses = JSON.parse(item.parser_statuses) || {};
 
             for (let parser in statuses) {
                 if (statuses[parser]) {
                     const parserIcon = document.createElement('span');
-                    parserIcon.className = 'parser-icon';
+                    parserIcon.className = 'parser-icon green-check';
                     parserIcon.textContent = '✅';
                     listItem.appendChild(parserIcon);
 
@@ -302,7 +257,6 @@
                 listItem.appendChild(count);
             }
 
-            // Add the delete link for each company
             const deleteLink = document.createElement('a');
             deleteLink.href = `/digsearch/delete_company/${item.id}`;
             deleteLink.textContent = ' Удалить';
@@ -311,31 +265,6 @@
             companyList.appendChild(listItem);
         });
     }
-
-
-    document.getElementById('searchInput').addEventListener('input', function () {
-        let input = this.value;
-        if (!input) {
-            document.getElementById('autocomplete-list').innerHTML = '';
-            return;
-        }
-        fetch(`/digsearch/autocomplete?query=${input}`)
-            .then(response => response.json())
-            .then(data => {
-                let autocompleteResults = document.getElementById('autocomplete-list');
-                autocompleteResults.innerHTML = '';
-                data.matches.forEach(function (item) {
-                    let div = document.createElement('div');
-                    div.innerHTML = item;
-                    div.addEventListener('click', function () {
-                        document.getElementById('searchInput').value = this.innerText;
-                        autocompleteResults.innerHTML = '';
-                    });
-                    autocompleteResults.appendChild(div);
-                });
-            });
-    });
-
 </script>
 
 </body>
