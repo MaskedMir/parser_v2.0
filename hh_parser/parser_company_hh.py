@@ -24,9 +24,9 @@ async def parser(url: str) -> list or bool:
     Args: url (str)
 
     Returns: list[name] or bool(False)
-    :param url:
-    :return list[name]
-    :exception: логирует ошибки, возвращает False
+    :param url: str
+    :return: company name: list
+    :exception 404: False
     """
     try:
         async with aiohttp.ClientSession() as session:
