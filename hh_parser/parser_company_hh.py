@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from time import time
 import logging
 
-from database.database import HHCompanyList
+from postgresql_db.query import async_insert_company_hh
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(asctime)s %(message)s")
 HEADERS = {
@@ -71,10 +71,8 @@ async def process_page(semaphore, region, letter, page, base_url) -> None or boo
         _temp = await parser(result_url)
         end_time = time()
         if _temp:
-            # HHCompanyList.create(name=_temp)
             for name in _temp:
-                with open('file.txt', 'a', encoding='utf-8') as f:
-                    f.write(f'{name}\n')
+                await async_insert_company_hh(name)
             logging.info(f'{region=} {letter=} {page=} | {round(end_time - start_time, 3)} sec')
         else:
             return False
