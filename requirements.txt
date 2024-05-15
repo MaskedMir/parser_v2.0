@@ -1,14 +1,33 @@
 playwright==1.43.0
 playwright_stealth~=1.0.5
-beautifulsoup4==4.12.2
 peewee==3.16.3
 mysql~=0.0.3
 pymysql~=1.1.0
 spacy~=3.7.4
-requests~=2.31.0
 apscheduler~=3.10.3
 python-dotenv~=1.0.0
-fastapi~=0.101.1
-uvicorn~=0.23.2
 starlette==0.27.0
 python-multipart~=0.0.6
+
+shared~=0.0.30
+mysqlclient~=2.2.4
+
+asyncio==3.4.2  # асинхронное выполнение кода
+aiohttp~=3.9.5  # асинхронное выполнение HTTP запросов
+
+requests~=2.31.0  # синхронная выполнение HTTP запросов
+beautifulsoup4==4.12.2  # работа с http файлами из полученных get запросов
+
+logging==0.4.9.6  # логирование информации
+
+pydantic==2.7.1  # работа с .env файлами
+pydantic_settings==2.2.1
+
+sqlalchemy==2.0.30  # основная библиотека для работы с БД
+
+asyncpg==0.29.0 # асинхронная/синхронная работа с БД
+psycopg2==2.9.9
+psycopg2-binary==2.9.9
+
+uvicorn~=0.23.2  # ASGI сервер для запуска FastAPI приложения
+fastapi~=0.101.1  # веб-фреймворк для создания API
