@@ -40,7 +40,7 @@ def create_connection():
         db="db_digsearch",
         user="user1",
         passwd="testpass",
-        ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject1\dig-search-develop_2\database\MySQL.pem'}
+        ssl={'ca': '\database\MySQL.pem'}
     )
     return conn
 
