@@ -9,7 +9,7 @@ import MySQLdb
 
 from playwright.async_api import async_playwright
 from hh_parser import HeadHunterParser
-from hh_parser.parse_company_hh import generate_url
+from hh_parser.parser_company_hh import generate_url            # Парсер имен компаний
 from tadv_parser import TadViserParser
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db
@@ -476,8 +476,8 @@ async def run_parsers():
 
 
 def start_server():
-    # uvicorn.run(app, host="0.0.0.0", port=3306)
-    uvicorn.run(app, host="127.0.0.1", port=3306)
+    uvicorn.run(app, host="0.0.0.0", port=3306)
+
 
 app.include_router(router)
 templates.env.filters["fromjson"] = fromjson
