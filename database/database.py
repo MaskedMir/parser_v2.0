@@ -16,7 +16,7 @@ conn = MySQLdb.connect(
       db="db_digsearch",
       user="user1",
       passwd="testpass",
-      ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject1\dig-search-develop_2\database\MySQL.pem'}
+      ssl={'ca': '\database\MySQL.pem'}
       # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
     )
 
@@ -35,16 +35,6 @@ print(cur.fetchone()[0])
 
 conn.close()
 
-# db = PooledMySQLDatabase(
-#     DB_NAME,
-#     user=DB_USER,
-#     password=DB_SECRET,
-#     host=DB_HOST,
-#     max_connections=10,  # максимальное количество соединений в пуле
-#     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-#     ssl = {'ca': 'database/MySQL.pem'}
-# )
-
 db = PooledMySQLDatabase(
     DB_NAME,
     user=DB_USER,
@@ -52,7 +42,7 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject1\dig-search-develop_2\database\MySQL.pem'}
+    ssl={'ca': '\database\MySQL.pem'}
     # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
