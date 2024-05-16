@@ -7,6 +7,7 @@ from base_parser import BaseParser
 from bs4 import BeautifulSoup
 from database import Resume, Vacancy, Company
 from shared import should_stop
+
 # from playwright._impl._api_types import TimeoutError
 
 
@@ -16,7 +17,8 @@ should_continue = True
 def clean_url_string(s):
     s = s.replace(' ', '+')
 
-    # Убираем все символы, которые не подходят для URL (оставляем только буквы, цифры, некоторые специальные символы и '+')
+    # Убираем все символы, которые не подходят для URL
+    # (оставляем только буквы, цифры, некоторые специальные символы и '+')
     s = re.sub(r'[^a-zA-Z0-9\-_\.+а-яА-ЯёЁ]', '', s)
 
     return s
@@ -77,10 +79,10 @@ class HeadHunterParser(BaseParser):
             result_text = ""
             print("PARSER COMPANY", company_name, clean_url_string(company_name), company_url)
 
-            resume_url = self.resume_head + clean_url_string(company_name) + self.resume_tail
+            resume_url = self.resume_head + clean_url_string(company_name) + self.resume_tail   # Ссылка на резюме
 
             if company_url is None:
-                company_url = await self.find_company_url(page, company_name)
+                company_url = await self.find_company_url(page, company_name)   # Ищем компанию если не указана
 
             print("URL", company_url)
 

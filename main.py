@@ -8,7 +8,7 @@ import json
 
 from playwright.async_api import async_playwright
 from hh_parser import HeadHunterParser
-from hh_parser.parse_company_hh import generate_url
+from hh_parser.parser_company_hh import generate_url            # Парсер имен компаний
 from tadv_parser import TadViserParser
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db
