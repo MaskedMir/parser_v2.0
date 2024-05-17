@@ -42,45 +42,24 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
     - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
   script:
-###############################
-#    - chmod og= $ID_RSA
-#    - chmod og= $ENV
-#    - chmod og= $DOCKER_ENV
-#    # - echo -e "HOST=https://$BOT_HOST" >> $DOCKER_ENV
-#    - echo -e "APP_NAME=$APP_NAME" >> $DOCKER_ENV
-#    - echo -e "APP_PATH=$APP_PATH" >> $DOCKER_ENV
-#    - echo -e "DOCKER_APP_PATH=$DOCKER_APP_PATH" >> $DOCKER_ENV
-#    - echo -e "TAG_COMMIT=$TAG_COMMIT" >> $DOCKER_ENV
-#    - apk update && apk add openssh-client
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "rm $APP_PATH/ -R || true"
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "mkdir -p $APP_PATH/ || true"
-#    - scp -i $ID_RSA -o StrictHostKeyChecking=no $ENV $SERVER_USER@$SERVER_IP:$APP_PATH/.env
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "chmod a+r $APP_PATH/.env"
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "docker pull $TAG_COMMIT"
-#    - scp -i $ID_RSA -o StrictHostKeyChecking=no docker-compose.yaml $SERVER_USER@$SERVER_IP:$APP_PATH/
-#    - scp -i $ID_RSA -o StrictHostKeyChecking=no seccomp_profile.json $SERVER_USER@$SERVER_IP:$APP_PATH/
-#    - scp -i $ID_RSA -o StrictHostKeyChecking=no $DOCKER_ENV $SERVER_USER@$SERVER_IP:$APP_PATH/.docker_env
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "docker compose --env-file $APP_PATH/.docker_env --env-file $APP_PATH/.env
-#      -f $APP_PATH/docker-compose.yaml rm -f -s"
-#    - >
-#      ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP
-#      "docker compose --env-file $APP_PATH/.docker_env --env-file $APP_PATH/.env
-#      -f $APP_PATH/docker-compose.yaml up -d"
-####################################################
     - ssh $SSH_USER@$SSH_HOST "echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin && cd $WORK_DIR &&  docker compose pull && docker-compose up  --force-recreate -d && exit"
+    - echo 'To work with logs follow link http://51.250.87.87:9000/search?rangetype=relative&fields=message%2Csource&width=2143&highlightMessage=&relative=300&q=dig-search-develop_2'
+  tags:
+    - docker
+
+
+shutdown:
+  image: ubuntu:latest
+  stage: deploy
+  when: manual
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SSH_HOST "echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin && cd $WORK_DIR && docker compose down  && exit"
   tags:
     - docker
 
