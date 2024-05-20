@@ -289,7 +289,7 @@ html {
         <input type="text" id="searchInput"  autocomplete="off"
            name="company_name" class="search-input" placeholder="Введите название компании..">
         <div id="autocomplete-list"></div>
-        <button type="submit" onclick="searchEmployees()" class="btn">найти</button>
+        <button type="submit" onclick="searchEmployees()" class="btn">добавить</button>
     </fieldset>
 </form>
 <ul id="company-list" class="setting__list">
@@ -434,11 +434,6 @@ html {
             });
     }
 
-    function selectItem(value) {
-        const input = document.querySelector('.search-input');
-        input.value = value;
-        document.getElementById('autocomplete-list').style.display = 'none';
-    }
 
     document.addEventListener("DOMContentLoaded", function () {
         const eventSource = new EventSource('/digsearch/sse');
