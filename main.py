@@ -40,7 +40,8 @@ def create_connection():
         db="db_digsearch",
         user="user1",
         passwd="testpass",
-        ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject1\dig-search-develop_2\database\MySQL.pem'}
+        ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
+        # ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject1\dig-search-develop_2\database\MySQL.pem'}
     )
     return conn
 
@@ -180,44 +181,6 @@ async def toggle_parser():
     return RedirectResponse(url="/digsearch/", status_code=303)
 
 
-@router.get("/employees")
-def get_employees(request: Request):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name FROM hhcomplist")
-    employees = cursor.fetchall()
-    conn.close()
-    return templates.TemplateResponse("index.html", {"request": request, "employees": employees})
-
-@router.get("/employees/{id}")
-def get_employee(id: int):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM hhcomplist WHERE id = %s", (id,))
-    employee = cursor.fetchone()
-    conn.close()
-    if employee:
-        return {"employee": employee}
-    else:
-        raise HTTPException(status_code=404, detail="Employee not found")
-
-@router.post("/employees")
-def add_employee(name: str, id: int):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO hhcomplist (name, id) VALUES (%s, %s)", (name, id))
-    conn.commit()
-    conn.close()
-    return {"message": "Employee added successfully"}
-
-@router.delete("/employees/{id}")
-def delete_employee(id: int):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM hhcomplist WHERE id = %s", (id,))
-    conn.commit()
-    conn.close()
-    return {"message": "Employee deleted successfully"}
 
 @router.get("/autocomplete")
 async def autocomplete(query: str):
@@ -483,7 +446,6 @@ app.include_router(router)
 templates.env.filters["fromjson"] = fromjson
 
 if __name__ == '__main__':
-    # generate_url()
     server_thread = threading.Thread(target=start_server)
     server_thread.start()
 
