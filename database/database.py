@@ -182,11 +182,23 @@ class tvcomplist(Model):
     class Meta:
         database = db
 
+class hhindustry(Model):
+    id_industry = IntegerField()
+    name_industry = TextField()
+    class Meta:
+        database = db
+
+class hhsubindustry(Model):
+    id_industry = IntegerField()
+    id_sub_industry = IntegerField()
+    name_sub_industry = TextField()
+    class Meta:
+        database = db
 
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist, TESTTABLE])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist, hhindustry, hhsubindustry])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0

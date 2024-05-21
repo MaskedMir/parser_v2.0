@@ -96,5 +96,5 @@ async def main():
     semaphore = asyncio.Semaphore(2)
     await generate_url(base_url, letters, semaphore)
 
-if __name__ == '__main__':
-    asyncio.run(main())
+# if __name__ == '__main__':
+#     asyncio.run(main())
