@@ -4,39 +4,6 @@ from config import DB_HOST, DB_NAME, DB_SECRET, DB_USER
 from datetime import datetime, MINYEAR
 from typing import Any, TypeVar
 
-import pymysql
-
-print(DB_HOST, DB_NAME, DB_SECRET, DB_USER)
-
-import MySQLdb
-
-conn = MySQLdb.connect(
-      host="rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net",
-      port=3306,
-      db="db_digsearch",
-      user="user1",
-      passwd="testpass",
-      ssl={'ca': '/database/MySQL.pem'}      
- #     ssl={'ca': '\database\MySQL.pem'}
-      # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
-
-    )
-
-cur = conn.cursor()
-cur.execute('SELECT version()')
-
-
-DB_USER = "user1"
-DB_SECRET = "testpass"
-DB_NAME = "db_digsearch"
-DB_HOST = "rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net"
-DB_PORT = 3306
-
-
-print(cur.fetchone()[0])
-
-conn.close()
-
 db = PooledMySQLDatabase(
     DB_NAME,
     user=DB_USER,
@@ -45,7 +12,6 @@ db = PooledMySQLDatabase(
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
     ssl={'ca': '/database/MySQL.pem'}
-    # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
 )
 
 
@@ -172,43 +138,48 @@ class SearchCompany(BaseModel):
     parser_statuses = TextField(default="{}")
 
 
-
 class hhindustry(Model):
     id_industry = IntegerField()
     name_industry = TextField()
+
     class Meta:
         database = db
+
 
 class hhsubindustry(Model):
     id_industry = IntegerField()
     id_sub_industry = IntegerField()
     name_sub_industry = TextField()
+
     class Meta:
         database = db
+
 
 class tvindustry(Model):
     name_industry = TextField()
     count_industry = IntegerField()
+
     class Meta:
         database = db
+
 
 class HHCompList(BaseModel):
     name = TextField(unique=True)
     tag = TextField()
 
+
 class TVcompList(BaseModel):
     name = TextField(unique=True)
     tag = TextField()
 
+
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist,
+                  Passport, Vacancy, Resume, Industry, Product, HHCompList, TVcompList,
                   hhindustry, hhsubindustry, tvindustry])
-
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0
     company.parser_statuses = {}
     company.save()
-

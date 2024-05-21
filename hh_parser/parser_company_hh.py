@@ -13,7 +13,7 @@ HEADERS = {
                      Chrome/58.0.3029.110 Safari/537.3'
 }
 
-with open('regions.txt', 'r') as file:                  # номера регионов
+with open('hh_parser/regions.txt', 'r') as file:                  # номера регионов
     REGIONS = [line.strip() for line in file]
 
 

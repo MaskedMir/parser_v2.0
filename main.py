@@ -34,17 +34,6 @@ def fromjson(value):
     except json.JSONDecodeError:
         return {}
 
-def create_connection():
-    conn = MySQLdb.connect(
-        host="rc1a-3r7wr8qzh4gvbrk9.mdb.yandexcloud.net",
-        port=3306,
-        db="db_digsearch",
-        user="user1",
-        passwd="testpass",
-        # ssl={'ca': '\database\MySQL.pem'}
-        ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
-    )
-    return conn
 
 
 @router.get('/')
@@ -187,7 +176,7 @@ async def toggle_parser():
 @router.get("/autocomplete")
 async def autocomplete(query: str):
     try:
-        conn = create_connection()
+        conn = db
         cursor = conn.cursor()
         query = f"%{query}%"
         cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
