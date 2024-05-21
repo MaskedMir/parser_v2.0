@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.43.0-jammy
+FROM python:3.12
 
 ARG DOCKER_APP_PATH
 
@@ -22,9 +22,8 @@ RUN mkdir -p ./templates
 COPY templates ./templates
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        pkg-config libmysqlclient-dev build-essential python3-dev bash
+        pkg-config default-libmysqlclient-dev build-essential python3-dev bash
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "-u", "main.py"]
-

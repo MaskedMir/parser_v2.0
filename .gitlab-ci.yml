@@ -18,9 +18,9 @@ build:
   before_script:
     - echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin
   script:
-    - docker build --tag $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG .
+#    - docker build --tag $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG .
     - docker build --tag $REGISTRY/$IMAGE_NAME:latest .
-    - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG
+#    - docker push $REGISTRY/$IMAGE_NAME:$CI_COMMIT_TAG
     - docker push $REGISTRY/$IMAGE_NAME:latest
   tags:
     - docker
@@ -43,7 +43,7 @@ deploy:
     - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
   script:
     - ssh $SSH_USER@$SSH_HOST "echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin && cd $WORK_DIR &&  docker compose pull && docker-compose up  --force-recreate -d && exit"
-    - echo 'To work with logs follow link http://51.250.87.87:9000/search?rangetype=relative&fields=message%2Csource&width=2143&highlightMessage=&relative=300&q=dig-search-develop_2'
+    - echo 'To work with logs follow link https://graylog.backend.planetra.ru'
   tags:
     - docker
 
