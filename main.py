@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 import random
@@ -9,7 +10,7 @@ import MySQLdb
 
 from playwright.async_api import async_playwright
 from hh_parser import HeadHunterParser
-from hh_parser.parser_company_hh import generate_url            # Парсер имен компаний
+from hh_parser.parser_company_hh import main            # Парсер имен компаний
 from tadv_parser import TadViserParser
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db
@@ -40,9 +41,11 @@ def create_connection():
         db="db_digsearch",
         user="user1",
         passwd="testpass",
-        ssl={'ca': '\database\MySQL.pem'}
+        # ssl={'ca': '\database\MySQL.pem'}
+        ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
     )
     return conn
+
 
 @router.get('/')
 def index(request: Request):
@@ -183,15 +186,16 @@ async def toggle_parser():
 
 @router.get("/autocomplete")
 async def autocomplete(query: str):
-    conn = create_connection()
-    cursor = conn.cursor()
-    query = f"%{query}%"
-    cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
-    names = cursor.fetchall()
-    conn.close()
-    return {"matches": [names[name][0] for name in range(5)]}
-
-
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        query = f"%{query}%"
+        cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
+        names = cursor.fetchall()
+        conn.close()
+        return {"matches": [names[name][0] for name in range(5)]}
+    except Exception as e:
+        logging.info(e)
 
 
 def search_for_technologies(text, technologies):
@@ -438,7 +442,8 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=3306)
+    # uvicorn.run(app, host="0.0.0.0", port=3306)
+    uvicorn.run(app, host="127.0.0.1", port=5000)
 
 
 app.include_router(router)

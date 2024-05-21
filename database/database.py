@@ -16,8 +16,8 @@ conn = MySQLdb.connect(
       db="db_digsearch",
       user="user1",
       passwd="testpass",
-      ssl={'ca': '\database\MySQL.pem'}
-      # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+      # ssl={'ca': '\database\MySQL.pem'}
+      ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
     )
 
 cur = conn.cursor()
@@ -42,8 +42,8 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl={'ca': '\database\MySQL.pem'}
-    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+    # ssl={'ca': '\database\MySQL.pem'}
+    ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
 
@@ -170,18 +170,23 @@ class SearchCompany(BaseModel):
     parser_statuses = TextField(default="{}")
 
 
-class HHCompanyList(BaseModel):
+class HHCompList(Model):
     name = TextField(unique=True)
+    tag = TextField()
+    class Meta:
+        database = db
 
 
-class tvcomplist(BaseModel):
+class tvcomplist(Model):
     name = TextField(unique=True)
+    class Meta:
+        database = db
 
 
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompanyList, tvcomplist])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist, TESTTABLE])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0
