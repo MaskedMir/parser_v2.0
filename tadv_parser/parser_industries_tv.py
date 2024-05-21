@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 import logging
 
-from postgresql_db.query import insert_industries_tv
+from database.database import tvindustry
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(asctime)s %(message)s")
 HEADERS = {
@@ -37,8 +37,8 @@ def parser():
                         count = int(''.join(filter(str.isdigit, _count)))
                         # with open('file.txt', 'a', encoding='utf-8') as f:
                         #     f.write(f'{name} {count}\n')
-
-                        insert_industries_tv(name, count)
+                        if not tvindustry.select().where(tvindustry.name_industry == name).exists():
+                            tvindustry.create(name_industry=name, count_industry=count)
                     except Exception:
                         continue
                 else:
@@ -55,5 +55,5 @@ def parser():
         return False
 
 
-if __name__ == '__main__':
-    parser()
+# if __name__ == '__main__':
+#     parser()
