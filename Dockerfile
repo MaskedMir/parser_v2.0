@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright/python:v1.43.0-jammy
+FROM python3:12
 
 ARG DOCKER_APP_PATH
 
