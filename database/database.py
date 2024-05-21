@@ -17,7 +17,7 @@ conn = MySQLdb.connect(
       user="user1",
       passwd="testpass",
       ssl={'ca': '\database\MySQL.pem'}
-      # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+      # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
     )
 
 cur = conn.cursor()
@@ -43,7 +43,7 @@ db = PooledMySQLDatabase(
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
     ssl={'ca': '\database\MySQL.pem'}
-    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+    # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
 )
 
 
@@ -170,18 +170,18 @@ class SearchCompany(BaseModel):
     parser_statuses = TextField(default="{}")
 
 
-class HHCompanyList(BaseModel):
+class HHCompList(BaseModel):
     name = TextField(unique=True)
+    tag = TextField()
 
-
-class tvcomplist(BaseModel):
+class TVcompList(BaseModel):
     name = TextField(unique=True)
-
+    tag = TextField()
 
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompanyList, tvcomplist])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompList, TVcompList])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0
