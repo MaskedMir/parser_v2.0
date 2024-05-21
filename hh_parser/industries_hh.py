@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import MySQLdb
 import pandas as pd
-import pymysql
 from database.database import hhindustry, hhsubindustry
-from sqlalchemy import create_engine
-from postgresql_db.database import sync_engine
 
 df_industry = pd.read_csv('industry.csv', sep=';', encoding='cp1251')
 df_sub_industry = pd.read_csv('sub_industry.csv', sep=';', encoding='cp1251')

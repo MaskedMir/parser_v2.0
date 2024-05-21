@@ -195,10 +195,17 @@ class hhsubindustry(Model):
     class Meta:
         database = db
 
+class tvindustry(Model):
+    name_industry = TextField()
+    count_industry = IntegerField()
+    class Meta:
+        database = db
+
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
-                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist, hhindustry, hhsubindustry])
+                  Passport, Vacancy, Resume, Industry, Product, HHCompList, tvcomplist,
+                  hhindustry, hhsubindustry, tvindustry])
 
 for company in SearchCompany.select():
     company.active_parsers_count = 0
