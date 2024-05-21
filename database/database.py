@@ -16,7 +16,7 @@ conn = MySQLdb.connect(
       db="db_digsearch",
       user="user1",
       passwd="testpass",
-      ssl={'ca': 'database\MySQL.pem'}      
+      ssl={'ca': '/database/MySQL.pem'}      
  #     ssl={'ca': '\database\MySQL.pem'}
       # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
     )
