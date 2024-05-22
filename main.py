@@ -186,6 +186,19 @@ async def autocomplete(query: str):
     except Exception as e:
         logging.info(e)
 
+@router.get("/autocomplete2")
+async def autocomplete2(query: str):
+    try:
+        conn = db
+        cursor = conn.cursor()
+        query = f"%{query}%"
+        cursor.execute("SELECT name_industry FROM tvindustry WHERE name_industry LIKE %s", (query,))
+        names = cursor.fetchall()
+        conn.close()
+        return {"matches": [names[name][0] for name in range(5)]}
+    except Exception as e:
+        logging.info(e)
+
 
 def search_for_technologies(text, technologies):
     """Search for technologies in the given text and return a list of found technologies."""

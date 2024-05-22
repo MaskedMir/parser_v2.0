@@ -3,268 +3,252 @@
 <head>
     <style>
         .processing-icon {
-    margin-left: 5px;
-}
+            margin-left: 5px;
+        }
 
-.parser-count {
-    font-size: 0.9em;
-    color: #888;
-    margin-left: 3px;
-}
+        .parser-count {
+            font-size: 0.9em;
+            color: #888;
+            margin-left: 3px;
+        }
 
-.green-check {
-    color: green;
-}
+        .green-check {
+            color: green;
+        }
 
-#autocomplete-list {
-    position: absolute;
-    border: 1px solid #d4d4d4;
-    border-bottom: none;
-    border-top: none;
-    z-index: 99;
-    top: 30px;
-    left: 0;
-    width: 100%;
-}
+        #autocomplete-list {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 30px;
+            left: 0;
+            width: 100%;
+        }
 
-.autocomplete-list--disable {
-    display: none;
-    overflow: hidden;
-}
+        .autocomplete-list--disable {
+            display: none;
+            overflow: hidden;
+        }
 
-#autocomplete-list div {
-    padding: 10px;
-    cursor: pointer;
-    background-color: #fff;
-    border-bottom: 1px solid #d4d4d4;
-}
+        #autocomplete-list div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
 
-#autocomplete-list div:hover {
-    background-color: #e9e9e9;
-}
+        #autocomplete-list div:hover {
+            background-color: #e9e9e9;
+        }
 
-#search-results {
-    margin-top: 20px;
-}
+        #autocomplete-list-2 {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 30px;
+            left: 0;
+            width: 100%;
+        }
 
-.list-of-companies {
-    border: none;
-    position: relative;
-    padding: 0;
-    display: flex;
-    gap: 5px;
-}
+        .autocomplete-list--disable {
+            display: none;
+            overflow: hidden;
+        }
 
-html {
-    box-sizing: border-box;
-    }
+        #autocomplete-list-2 div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
 
-    .page {
-        padding: 0;
-        margin: 0;
-        background-color: #24283A;
-        font-family: 'Roboto', sans-serif;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 20px;
-        color: #B8BFCC;
-        box-sizing: border-box;
-    }
+        #autocomplete-list-2 div:hover {
+            background-color: #e9e9e9;
+        }
 
-    body, html {
-        height: 100vh;
-    }
+        #search-results {
+            margin-top: 20px;
+        }
 
-    /*Header*/
+        .list-of-companies {
+            border: none;
+            position: relative;
+            padding: 0;
+            display: flex;
+            gap: 5px;
+        }
 
-    .header {
-        display: flex;
-        background-color: #2F3349;
-        border-bottom: 1px solid #424A74;
-    }
+        html {
+            box-sizing: border-box;
+        }
 
-    .header__logo {
-        padding: 9px 26px 9px 16px;
-    }
+        .page {
+            padding: 0;
+            margin: 0;
+            background-color: #24283A;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 20px;
+            color: #B8BFCC;
+            box-sizing: border-box;
+        }
 
-    .header__name {
-        padding: 0;
-        margin: 0;
-        color: #E6E6E6;
-    }
+        body, html {
+            height: 100vh;
+        }
 
-    .header__version {
-        padding: 0;
-        margin: 0;
-        color: #999999;
-        font-size: 12.5px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 100%;
-        text-align: right;
-    }
 
-    .nav__list {
-        padding: 0;
-        margin: 0;
-        display: flex;
-    }
+        /* Main */
+        .main {
+            display: grid;
+            grid-template-columns: 350px 1111px 399px;
+            grid-template-rows: 907px 50px;
+            gap: 20px;
+        }
 
-    .nav__item {
-        list-style: none;
-    }
+        .options {
+            grid-row: 1/4;
+            padding: 16px;
+            background-color: #2F3349;
+            border-right: 1px solid #424A74;
+        }
 
-    .nav__link {
-        text-decoration: none;
-        color: #FFF;
-        display: block;
-        padding: 16px;
-    }
+        .options__title {
+            font-size: 20px;
+            line-height: 26px;
+            color: #FFFFFF;
+            padding: 0;
+            margin: 0;
+            margin-bottom: 20px;
+        }
 
-    .nav__link:hover, .nav__link:focus {
-        background-color: #383D56;
-        outline: none;
-    }
+        .search-input {
+            width: 100%;
+            border: 0;
+            background-color: #383D56;
+            outline: 1px solid #414970;
+            border-radius: 6px;
+            box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+            padding: 7.5px 8px;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            color: #B8BFCC;
+        }
 
-    .nav__link--active {
-        background-color: #EA5355;
-    }
 
-    .nav__link--active:hover, .nav__link--active:focus  {
-        background-color: #EA5355;
-    }
+        .search-input-2 {
+            width: 100%;
+            border: 0;
+            background-color: #383D56;
+            outline: 1px solid #414970;
+            border-radius: 6px;
+            box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+            padding: 7.5px 8px;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            color: #B8BFCC;
+        }
+        .setting__list {
+            margin: 0;
+            padding: 0;
+            max-height: 402px;
+            overflow: auto;
+            margin-bottom: 36px;
+        }
 
-    /* Main */
-    .main {
-        display: grid;
-        grid-template-columns: 350px 1111px 399px;
-        grid-template-rows: 907px 50px;
-        gap: 20px;
-    }
+        .setting__item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 16px 6px 8px;
+            border-bottom: 1px solid #414970;
+        }
 
-    .options {
-        grid-row: 1/4;
-        padding: 16px;
-        background-color: #2F3349;
-        border-right: 1px solid #424A74;
-    }
+        .label {
+            display: flex;
+            gap: 0 20px;
+            width: 100%;
+            justify-content: start;
+        }
 
-    .options__title {
-        font-size: 20px;
-        line-height: 26px;
-        color: #FFFFFF;
-        padding: 0;
-        margin: 0;
-        margin-bottom: 20px;
-    }
+        .label__mask {
+            display: block;
+            width: 16px;
+            height: 16px;
+            outline: 1px solid #414970;
+            background-color: #B8BFCC;
+            position: relative;
+            border-radius: 3px;
+        }
 
-    .search-input {
-        width: 100%;
-        border: 0;
-        background-color: #383D56;
-        outline: 1px solid #414970;
-        border-radius: 6px;
-        box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
-        padding: 7.5px 8px;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 14px;
-        color: #B8BFCC;
-    }
+        .label__name {
+            margin-right: auto;
+        }
 
-    .setting__list {
-        margin: 0;
-        padding: 0;
-        max-height: 402px;
-        overflow: auto;
-        margin-bottom: 36px;
-    }
+        .label__checkbox[type="checkbox"]:checked + .label__mask::before {
+            content: "";
+            position: absolute;
+            background-image: url("assets/icon/checkbox.svg");
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-    .setting__item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 6px 16px 6px 8px;
-        border-bottom: 1px solid #414970;
-    }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            border: 0;
+            padding: 0;
+            white-space: nowrap;
+            clip-path: inset(100%);
+            clip: rect(0 0 0 0);
+            overflow: hidden;
+        }
 
-    .label {
-        display: flex;
-        gap: 0 20px;
-        width: 100%;
-        justify-content: start;
-    }
+        .list-of-companies__btn {
+            flex-basis: 80px;
+            color: #B8BFCC;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
 
-    .label__mask {
-        display: block;
-        width: 16px;
-        height: 16px;
-        outline: 1px solid #414970;
-        background-color: #B8BFCC;
-        position: relative;
-        border-radius: 3px;
-    }
+        .btn {
+            border: none;
+            background-color: #383D56;
+            outline: 1px solid #424A74;
+            border-radius: 3px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 14px;
+            color: #B8BFCC;
+            border-radius: 6px;
+        }
 
-    .label__name {
-        margin-right: auto;
-    }
+        .delete {
+            text-decoration: none;
+            justify-self: end;
+        }
 
-    .label__checkbox[type="checkbox"]:checked + .label__mask::before {
-        content: "";
-        position: absolute;
-        background-image: url("assets/icon/checkbox.svg");
-        background-repeat: no-repeat;
-        width: 100%;
-        height: 100%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        border: 0;
-        padding: 0;
-        white-space: nowrap;
-        clip-path: inset(100%);
-        clip: rect(0 0 0 0);
-        overflow: hidden;
-    }
-
-    .list-of-companies__btn {
-        flex-basis: 80px;
-        color: #B8BFCC;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-    }
-
-    .btn {
-        border: none;
-        background-color: #383D56;
-        outline: 1px solid #424A74;
-        border-radius: 3px;
-        padding: 8px 12px;
-        font-size: 14px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 14px;
-        color:#B8BFCC;
-        border-radius: 6px
-;
-    }
-
-    .delete {
-        text-decoration: none;
-        justify-self: end;
-    }
-    /* Main */
+        /* Main */
 
 
     </style>
@@ -277,108 +261,145 @@ html {
 <main class="content__main main">
     <section class="main__options options">
         <h1 class="options__title">Парсер технологий компаний</h1>
-<form action="/digsearch/toggle_parser" method="post">
-    <a id="parser-status">Парсер остановлен</a>
-    <button id="parser-button" type="submit">Запустить</button>
-    <span id="restart-icon" style="display: none;">⚠️</span>
-</form>
+        <form action="/digsearch/toggle_parser" method="post">
+            <a id="parser-status">Парсер остановлен</a>
+            <button id="parser-button" type="submit">Запустить</button>
+            <span id="restart-icon" style="display: none;">⚠️</span>
+        </form>
 
-<h2>Список компаний</h2>
-<form action="/digsearch/add_company" method="post">
-    <fieldset class="list-of-companies">
-        <input type="text" id="searchInput"  autocomplete="off"
-           name="company_name" class="search-input" placeholder="Введите название компании..">
-        <div id="autocomplete-list"></div>
-        <button type="submit" onclick="searchEmployees()" class="btn">добавить</button>
-    </fieldset>
-</form>
-<ul id="company-list" class="setting__list">
-    {% for item in search_list %}
-    <li>
-        {{ item.company_name }}
-        {% set statuses = item.parser_statuses if item.parser_statuses is mapping else item.parser_statuses|fromjson %}
-        {% for parser, status in statuses.items() %}
-        {% if status %}
-        <span class="parser-icon green-check">✅</span>
-        <span class="parser-names">{{ parser.upper() }}</span>
+        <h2>Список компаний</h2>
+        <form action="/digsearch/add_company" method="post">
+            <fieldset class="list-of-companies">
+                <input type="text" id="searchInput" autocomplete="off"
+                       name="company_name" class="search-input" placeholder="Введите название компании..">
+                <div id="autocomplete-list"></div>
+                <button type="submit" onclick="searchEmployees()" class="btn">добавить</button>
+            </fieldset>
+        </form>
+        <ul id="company-list" class="setting__list">
+            {% for item in search_list %}
+            <li>
+                {{ item.company_name }}
+                {% set statuses = item.parser_statuses if item.parser_statuses is mapping else
+                item.parser_statuses|fromjson %}
+                {% for parser, status in statuses.items() %}
+                {% if status %}
+                <span class="parser-icon green-check">✅</span>
+                <span class="parser-names">{{ parser.upper() }}</span>
+                {% endif %}
+                {% endfor %}
+                {% if item.active_parsers_count > 0 %}
+                <span class="processing-icon">🔄</span>
+                <span class="parser-count">{{ item.active_parsers_count }}</span>
+                {% endif %}
+                <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Список отраслей</h2>
+        <form action="/digsearch/add_industry" method="post">
+            <input type="text" name="industry_name" placeholder="Введите название отрасли">
+            <button type="submit">Добавить отрасль</button>
+        </form>
+        <ul id="industry-list">
+            {% for item in industry_list %}
+            <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
+            {% endfor %}
+        </ul>
+
+        <h2>Список технологий</h2>
+        <form action="/digsearch/add_technology" method="post">
+            <fieldset class="list-of-companies">
+                <input type="text" name="technology_name" class="search-input-2" id="searchInput-2" autocomplete="off"
+                       placeholder="Введите название технологии">
+                <div id="autocomplete-list-2"></div>
+                <button type="submit" class="btn">Добавить технологию</button>
+            </fieldset>
+        </form>
+        <ul id="technology-list">
+            {% for tech in technologies %}
+            <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
+            {% endfor %}
+        </ul>
+
+        <h2>Компании с доступными технологиями</h2>
+        <form action="/digsearch/show_technologies" method="post">
+            <select name="selected_company">
+                {% for company in companies %}
+                <option value="{{ company.name }}"
+                        {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name
+                    }}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Отобразить">
+        </form>
+
+        {% if selected_company %}
+        <h2>Технологии для {{ selected_company }}</h2>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Название технологии</th>
+                <th>Дата</th>
+                <th>Источник</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for tech in company_technologies %}
+            <tr>
+                <td>{{ tech.technology }}</td>
+                <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
+                <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
         {% endif %}
-        {% endfor %}
-        {% if item.active_parsers_count > 0 %}
-        <span class="processing-icon">🔄</span>
-        <span class="parser-count">{{ item.active_parsers_count }}</span>
-        {% endif %}
-        <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
-    </li>
-    {% endfor %}
-</ul>
-
-<h2>Список отраслей</h2>
-<form action="/digsearch/add_industry" method="post">
-    <input type="text" name="industry_name" placeholder="Введите название отрасли">
-    <button type="submit">Добавить отрасль</button>
-</form>
-<ul id="industry-list">
-    {% for item in industry_list %}
-    <li>{{ item.name }} <a href="/digsearch/delete_industry/{{ item.id }}">Удалить</a></li>
-    {% endfor %}
-</ul>
-
-<h2>Список технологий</h2>
-<form action="/digsearch/add_technology" method="post">
-    <input type="text" name="technology_name" placeholder="Введите название технологии">
-    <button type="submit">Добавить технологию</button>
-</form>
-<ul id="technology-list">
-    {% for tech in technologies %}
-    <li>{{ tech.name }} <a href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a></li>
-    {% endfor %}
-</ul>
-
-<h2>Компании с доступными технологиями</h2>
-<form action="/digsearch/show_technologies" method="post">
-    <select name="selected_company">
-        {% for company in companies %}
-        <option value="{{ company.name }}"
-                {% if selected_company and company.name == selected_company %}selected{% endif %}>{{ company.name }}
-        </option>
-        {% endfor %}
-    </select>
-    <input type="submit" value="Отобразить">
-</form>
-
-{% if selected_company %}
-<h2>Технологии для {{ selected_company }}</h2>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Название технологии</th>
-        <th>Дата</th>
-        <th>Источник</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for tech in company_technologies %}
-    <tr>
-        <td>{{ tech.technology }}</td>
-        <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
-        <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{% endif %}
     </section>
 </main>
 
 
 <script>
+    const autocompleteList2 = document.getElementById('autocomplete-list-2');
+    const searchInput2 = document.getElementById('searchInput-2');
+
+    searchInput2.addEventListener('click', function () {
+        autocompleteList2.classList.remove('autocomplete-list--disable');
+    })
+
+    searchInput2.addEventListener('input', function () {
+        const input = this.value;
+        if (!input) {
+            document.getElementById('autocomplete-list-2').innerHTML = '';
+            return;
+        }
+        fetch(`/digsearch/autocomplete2?query=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                autocompleteList2.classList.remove('autocomplete-list--disable');
+                autocompleteList2.innerHTML = '';
+                data.matches.forEach(function (item) {
+                    const div = document.createElement('div');
+                    div.classList.add('autocomplete-list__item')
+                    div.textContent = item;
+                    div.addEventListener('click', function () {
+                        document.getElementById('searchInput-2').value = this.textContent;
+                        autocompleteList2.innerHTML = '';
+                    });
+                    autocompleteList2.appendChild(div);
+                });
+            });
+    });
+
 
     const autocompleteList = document.getElementById('autocomplete-list');
     const searchInput = document.getElementById('searchInput');
 
-     searchInput.addEventListener('click', function () {
-         autocompleteList.classList.remove('autocomplete-list--disable');
-     })
+    searchInput.addEventListener('click', function () {
+        autocompleteList.classList.remove('autocomplete-list--disable');
+    })
 
     searchInput.addEventListener('input', function () {
         const input = this.value;
@@ -395,44 +416,32 @@ html {
                     const div = document.createElement('div');
                     div.classList.add('autocomplete-list__item')
                     div.textContent = item;
-                    div.addEventListener('click', function() {
+                    div.addEventListener('click', function () {
                         document.getElementById('searchInput').value = this.textContent;
                         autocompleteList.innerHTML = '';
-                        searchEmployees();
                     });
                     autocompleteList.appendChild(div);
                 });
             });
     });
 
-     document.addEventListener('click', function (event) {
-         if (event.target.className !== 'search-input' &&
-             event.target.type !== 'submit' &&
-             event.target.className !== 'autocomplete-list__item'
-         ) {
-             autocompleteList.classList.add('autocomplete-list--disable')
-         }
-     });
+    document.addEventListener('click', function (event) {
+        if (event.target.className !== 'search-input' &&
+            event.target.type !== 'submit' &&
+            event.target.className !== 'autocomplete-list__item'
+        ) {
+            autocompleteList.classList.add('autocomplete-list--disable')
+        }
+    });
 
-    function searchEmployees() {
-        const name = document.getElementById('searchInput').value;
-        fetch(`/digsearch/employees/${name}`)
-            .then(response => response.json())
-            .then(data => {
-                const results = document.getElementById('search-results');
-                results.innerHTML = '';
-                if (data.employee) {
-                    results.innerHTML = `<p>Name: ${data.employee.name} - ID: ${data.employee.id}</p>`;
-                } else {
-                    results.innerHTML = '<p>No employee found.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const results = document.getElementById('search-results');
-                results.innerHTML = '<p>Error fetching data.</p>';
-            });
-    }
+    document.addEventListener('click', function (event) {
+        if (event.target.className !== 'search-input-2' &&
+            event.target.type !== 'submit' &&
+            event.target.className !== 'autocomplete-list__item'
+        ) {
+            autocompleteList2.classList.add('autocomplete-list--disable')
+        }
+    });
 
 
     document.addEventListener("DOMContentLoaded", function () {
