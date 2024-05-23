@@ -138,5 +138,5 @@ async def main():
     async with aiohttp.ClientSession() as session:
         await paginator(base_url, session, letters, semaphore)
 
-# if __name__ == '__main__':
-#     asyncio.run(main())
+def main_parser_hh_comp():
+    asyncio.run(main())

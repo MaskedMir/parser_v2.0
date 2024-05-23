@@ -16,9 +16,9 @@ from starlette.responses import RedirectResponse
 
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db, technology, hhindustry
-from hh_parser import HeadHunterParser
+from hh_parser import HeadHunterParser, main_parser_hh_comp
 from shared import should_stop
-from tadv_parser import TadViserParser
+from tadv_parser import TadViserParser, main_parser_tv_comp
 
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
@@ -210,6 +210,13 @@ async def autocomplete2(query: str):
         return {"matches": [names[name][0] for name in range(5)]}
     except Exception as e:
         logging.info(e)
+
+@router.get("/start-parsing-company-hh")
+def start_():
+    main_parser_hh_comp()
+@router.get("/start-parsing-company-tv")
+def start_():
+    main_parser_tv_comp()
 
 
 def search_for_technologies(text, technologies):

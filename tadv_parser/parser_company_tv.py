@@ -5,7 +5,7 @@ import aiohttp
 from time import time
 from bs4 import BeautifulSoup
 # from postgresql_db.query import async_insert_company_tv
-from database.database import tvcomplist
+from database.database import TVcompList
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(asctime)s %(message)s")
 HEADERS = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)\
@@ -82,8 +82,8 @@ async def generate_url(base_url, letters, semaphore):
             if _temp:
                 _start = time()
                 for name in _temp:
-                    if not tvcomplist.select().where(tvcomplist.name == name).exists():
-                        tvcomplist.create(name=name)
+                    if not TVcompList.select().where(TVcompList.name == name).exists():
+                        TVcompList.create(name=name)
                 _end = time()
                 logging.info(f'добавлено: {len(_temp)} : {_end - _start} sec')
                 logging.info(f'{letter=} | {round(end - start)} sec')
@@ -96,5 +96,5 @@ async def main():
     semaphore = asyncio.Semaphore(2)
     await generate_url(base_url, letters, semaphore)
 
-# if __name__ == '__main__':
-#     asyncio.run(main())
+def main_parser_tv_comp():
+    asyncio.run(main())

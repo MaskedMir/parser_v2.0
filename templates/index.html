@@ -43,7 +43,7 @@
             background-color: #e9e9e9;
         }
 
-         #autocomplete-list-3 {
+        #autocomplete-list-3 {
             position: absolute;
             border: 1px solid #d4d4d4;
             border-bottom: none;
@@ -316,7 +316,7 @@
                 <input type="text" id="searchInput" autocomplete="off"
                        name="company_name" class="search-input" placeholder="Введите название компании..">
                 <div id="autocomplete-list"></div>
-                <button type="submit" onclick="searchEmployees()" class="btn">добавить</button>
+                <button type="submit" class="btn">добавить</button>
             </fieldset>
         </form>
         <ul id="company-list" class="setting__list">
@@ -383,6 +383,10 @@
             <input type="submit" value="Отобразить">
         </form>
 
+        <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
+        <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
+
+
         {% if selected_company %}
         <h2>Технологии для {{ selected_company }}</h2>
         <table border="1">
@@ -406,6 +410,24 @@
         {% endif %}
     </section>
 </main>
+
+<script>
+    function run_parser_hh_comp() {
+        fetch(`/digsearch/start-parsing-company-hh`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+    }
+
+    function run_parser_tv_comp() {
+        fetch(`/digsearch/start-parsing-company-tv`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+    }
+</script>
+
+
 
 
 <script>

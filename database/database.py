@@ -175,6 +175,9 @@ class TVcompList(BaseModel):
     name = TextField(unique=True)
     tag = TextField()
 
+class technology(BaseModel):
+    technology = TextField(unique=True)
+
 # Create the tables in the database
 db.connect()
 db.create_tables([Company, SearchCompany, SearchTechnology, Project,
