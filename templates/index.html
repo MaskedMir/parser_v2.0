@@ -43,6 +43,33 @@
             background-color: #e9e9e9;
         }
 
+         #autocomplete-list-3 {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 30px;
+            left: 0;
+            width: 100%;
+        }
+
+        .autocomplete-list--disable {
+            display: none;
+            overflow: hidden;
+        }
+
+        #autocomplete-list-3 div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+        #autocomplete-list-3 div:hover {
+            background-color: #e9e9e9;
+        }
+
         #autocomplete-list-2 {
             position: absolute;
             border: 1px solid #d4d4d4;
@@ -158,6 +185,22 @@
             line-height: 14px;
             color: #B8BFCC;
         }
+
+        .search-input-3 {
+            width: 100%;
+            border: 0;
+            background-color: #383D56;
+            outline: 1px solid #414970;
+            border-radius: 6px;
+            box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+            padding: 7.5px 8px;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 14px;
+            color: #B8BFCC;
+        }
+
         .setting__list {
             margin: 0;
             padding: 0;
@@ -263,7 +306,7 @@
         <h1 class="options__title">Парсер технологий компаний</h1>
         <form action="/digsearch/toggle_parser" method="post">
             <a id="parser-status">Парсер остановлен</a>
-            <button id="parser-button" type="submit">Запустить</button>
+            <button id="parser-button" type="submit" class="btn">Запустить</button>
             <span id="restart-icon" style="display: none;">⚠️</span>
         </form>
 
@@ -299,8 +342,12 @@
 
         <h2>Список отраслей</h2>
         <form action="/digsearch/add_industry" method="post">
-            <input type="text" name="industry_name" placeholder="Введите название отрасли">
-            <button type="submit">Добавить отрасль</button>
+            <fieldset class="list-of-companies">
+                <input type="text" class="search-input-3" id="searchInput-3" autocomplete="off" name="industry_name"
+                       placeholder="Введите название отрасли">
+                <div id="autocomplete-list-3"></div>
+                <button type="submit" class="btn">Добавить отрасль</button>
+            </fieldset>
         </form>
         <ul id="industry-list">
             {% for item in industry_list %}
@@ -393,6 +440,45 @@
             });
     });
 
+    const autocompleteList3 = document.getElementById('autocomplete-list-3');
+    const searchInput3 = document.getElementById('searchInput-3');
+
+    searchInput3.addEventListener('click', function () {
+        autocompleteList3.classList.remove('autocomplete-list--disable');
+    })
+
+    searchInput3.addEventListener('input', function () {
+        const input = this.value;
+        if (!input) {
+            document.getElementById('autocomplete-list-3').innerHTML = '';
+            return;
+        }
+        fetch(`/digsearch/autocomplete3?query=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                autocompleteList3.classList.remove('autocomplete-list--disable');
+                autocompleteList3.innerHTML = '';
+                data.matches.forEach(function (item) {
+                    const div = document.createElement('div');
+                    div.classList.add('autocomplete-list__item')
+                    div.textContent = item;
+                    div.addEventListener('click', function () {
+                        document.getElementById('searchInput-3').value = this.textContent;
+                        autocompleteList3.innerHTML = '';
+                    });
+                    autocompleteList3.appendChild(div);
+                });
+            });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (event.target.className !== 'search-input-3' &&
+            event.target.type !== 'submit' &&
+            event.target.className !== 'autocomplete-list__item'
+        ) {
+            autocompleteList3.classList.add('autocomplete-list--disable')
+        }
+    });
 
     const autocompleteList = document.getElementById('autocomplete-list');
     const searchInput = document.getElementById('searchInput');

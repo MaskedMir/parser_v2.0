@@ -1,25 +1,24 @@
+import asyncio
+import json
 import logging
+import random
+import re
 import threading
 import time
-import random
-import asyncio
-import re
-import uvicorn
-import json
-import MySQLdb
-
-from playwright.async_api import async_playwright
-from hh_parser import HeadHunterParser
-from hh_parser.parser_company_hh import main            # Парсер имен компаний
-from tadv_parser import TadViserParser
-from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
-    Industry, Product, db
 from datetime import datetime
-from shared import should_stop
-from fastapi import FastAPI, APIRouter, Depends, Request, Form, HTTPException
-from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
+
+import uvicorn
+from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.templating import Jinja2Templates
+from playwright.async_api import async_playwright
+from starlette.responses import RedirectResponse
+
+from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
+    Industry, Product, db, technology, hhindustry
+from hh_parser import HeadHunterParser
+from shared import should_stop
+from tadv_parser import TadViserParser
 
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
@@ -33,7 +32,6 @@ def fromjson(value):
         return json.loads(value)
     except json.JSONDecodeError:
         return {}
-
 
 
 @router.get('/')
@@ -122,6 +120,7 @@ async def add_technology(technology_name: str = Form(...)):
             if name:
                 try:
                     SearchTechnology.create(name=name)
+                    technology.create(technology=name)
                 except IntegrityError:
                     continue
     return RedirectResponse(url="/digsearch/", status_code=303)
@@ -172,7 +171,6 @@ async def toggle_parser():
     return RedirectResponse(url="/digsearch/", status_code=303)
 
 
-
 @router.get("/autocomplete")
 async def autocomplete(query: str):
     try:
@@ -186,13 +184,27 @@ async def autocomplete(query: str):
     except Exception as e:
         logging.info(e)
 
+
 @router.get("/autocomplete2")
 async def autocomplete2(query: str):
     try:
         conn = db
         cursor = conn.cursor()
         query = f"%{query}%"
-        cursor.execute("SELECT name_industry FROM tvindustry WHERE name_industry LIKE %s", (query,))
+        cursor.execute("SELECT technology FROM technology WHERE technology LIKE %s", (query,))
+        names = cursor.fetchall()
+        conn.close()
+        return {"matches": [names[name][0] for name in range(5)]}
+    except Exception as e:
+        logging.info(e)
+
+@router.get("/autocomplete3")
+async def autocomplete2(query: str):
+    try:
+        conn = db
+        cursor = conn.cursor()
+        query = f"%{query}%"
+        cursor.execute("SELECT name_industry FROM hhindustry WHERE name_industry LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
         return {"matches": [names[name][0] for name in range(5)]}
@@ -266,6 +278,7 @@ def show_technologies_all_fields(company_id):
     sorted_data = sorted(results, key=lambda x: x['date'] if x['date'] else datetime.min, reverse=True)
 
     return sorted_data
+
 
 async def start_hh_parsing(browser):
     print("start_hh_parsing")
@@ -455,14 +468,12 @@ if __name__ == '__main__':
     server_thread = threading.Thread(target=start_server)
     server_thread.start()
 
-
     while True:
         if should_restart:
             should_restart = False
             should_stop.clear()
             asyncio.run(run_parsers())
             should_stop.clear()
-            should_restart = False
 
         time.sleep(5)
 
