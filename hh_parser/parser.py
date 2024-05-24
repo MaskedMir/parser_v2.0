@@ -5,7 +5,7 @@ import playwright
 from datetime import datetime, date
 from base_parser import BaseParser
 from bs4 import BeautifulSoup
-from database import Resume, Vacancy, Company
+from database import Resume, Vacancy, Company, SearchTechnology
 from shared import should_stop
 
 # from playwright._impl._api_types import TimeoutError
@@ -70,14 +70,14 @@ class HeadHunterParser(BaseParser):
                            "&items_on_page=100&no_magic=false"
 
     async def parse(self, company_name, company_url=None):
-        print("START PARSE HH")
+        print("[INFO] ЗАПУСК ПАРВЕРА HH")
         page = await self.get_new_page()
         self.company_name = company_name
 
-        print("RUN LOOP")
+        print("[INFO] RUN LOOP")
         try:
             result_text = ""
-            print("PARSER COMPANY", company_name, clean_url_string(company_name), company_url)
+            print("[INFO] ПАРСЕР КОМПАНИИ", company_name, clean_url_string(company_name), company_url)
 
             resume_url = self.resume_head + clean_url_string(company_name) + self.resume_tail   # Ссылка на резюме
 
@@ -91,7 +91,7 @@ class HeadHunterParser(BaseParser):
             await self.parse_resumes(resume_url, page)
 
         except Exception as e:
-            print("HH parser: ", e)
+            print("[ERROR] HH ПАРСЕР: ", e)
 
         await self.close(page)
 
@@ -111,7 +111,7 @@ class HeadHunterParser(BaseParser):
             try:
                 await page.wait_for_selector("[data-qa='employers-list-company-list']")
             except TimeoutError:
-                print("No company for industry")
+                print("[INFO] НЕТ КОМПАНИИ ПО ИНДУСТРИИ")
                 return ""
 
             # Получение всех дочерних div элементов
@@ -144,7 +144,6 @@ class HeadHunterParser(BaseParser):
 
     async def find_company_link_by_keyword(self, page, keyword: str):
         base_url = "https://hh.ru/employers_company?area=113"
-
         html_contnet = await self.get_page_content(base_url, page)
         if html_contnet is None:
             return None
@@ -153,7 +152,7 @@ class HeadHunterParser(BaseParser):
         content_block = soup.find("div", class_="employers-company__content")
 
         if not content_block:
-            print("No employers-company__content block found.")
+            print("[INFO] НЕТ БЛОКА employers-company__content")
             return None
 
         for link_element in content_block.find_all("a"):
@@ -161,7 +160,7 @@ class HeadHunterParser(BaseParser):
             if keyword in text_content:
                 return "/".join(page.url.split("/")[:3]) + link_element["href"]
 
-        print(f"No link found for keyword: {keyword}")
+        print(f"[INFO] НЕТ ССЫЛОК ПО КЛЮЧЕВОМУ СЛОВУ: {keyword}")
         return None
 
     async def find_all_companies(self, page, company_name: str) -> list:
@@ -220,7 +219,6 @@ class HeadHunterParser(BaseParser):
 
     async def parse_vacancy_url(self, url, page):
         print("PARSE VACANCY", url)
-
         content = await self.get_page_content(url, page)
         if content is None:
             return None
@@ -232,6 +230,15 @@ class HeadHunterParser(BaseParser):
         title_text = title_element.text if title_element else None
         description_element = soup.find('div', {'data-qa': 'vacancy-description'})
         description_text = description_element.get_text(separator=' ', strip=True) if description_element else None
+
+        # поиск технологий среди текста
+        select_technology = SearchTechnology.select()
+        technology = [tech.name for tech in select_technology]
+        # print(f'[TEST]ИЗ БД: {technology}')
+
+        found_technologies_l = [tech for tech in technology if tech.lower() in description_text.lower()]
+        found_technologies = ', '.join(found_technologies_l)
+        # print(f'[TEST] ИЗ ПАРСЕРА: list - {found_technologies_l} текст - {found_technologies}')
 
         date_element = soup.find('p', class_='vacancy-creation-time-redesigned')
         publication_date = None
@@ -251,7 +258,8 @@ class HeadHunterParser(BaseParser):
             "title": title_text,
             "description": description_text,
             "publication_date": publication_date,
-            "source": "hh; вакансия"
+            "source": "hh; вакансия",
+            "technology": found_technologies
         }
 
         return vacancy_data
@@ -365,6 +373,10 @@ class HeadHunterParser(BaseParser):
                                 vac_data["company"] = company
                                 vacancy = Vacancy(**vac_data)
                                 vacancy.save()
+                            else:
+                                query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
+                                query.execute()
+                                print(f'[TEST] Update Vacancy')
 
                     await local_page.close()
 
@@ -401,6 +413,10 @@ class HeadHunterParser(BaseParser):
                         vac_data["company"] = company
                         vacancy = Vacancy(**vac_data)
                         vacancy.save()
+                    else:
+                        query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
+                        query.execute()
+                        print(f'[TEST] Update Vacancy')
 
             await local_page.close()
 

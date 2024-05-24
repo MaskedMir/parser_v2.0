@@ -1,10 +1,9 @@
-from peewee import *
-from playhouse.pool import PooledMySQLDatabase
 # from config import DB_HOST, DB_NAME, DB_SECRET, DB_USER
 from datetime import datetime, MINYEAR
 from typing import Any, TypeVar
 
-
+from peewee import *
+from playhouse.pool import PooledMySQLDatabase
 
 DB_USER = "user1"
 DB_SECRET = "testpass"
@@ -19,8 +18,9 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject\dig-search-develop_2\database\MySQL.pem'}
+    ssl={'ca': '/database/MySQL.pem'}
     # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
+    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
 
@@ -108,6 +108,7 @@ class Vacancy(BaseModel):
     publication_date = DateTimeField(null=True)
     source = TextField(null=True)  # hh or tadviser
     url = TextField(unique=True)
+    technology = TextField(null=True)
 
 
 class Industry(BaseModel):
@@ -147,36 +148,44 @@ class SearchCompany(BaseModel):
     parser_statuses = TextField(default="{}")
 
 
-
 class hhindustry(Model):
     id_industry = IntegerField()
     name_industry = TextField()
+
     class Meta:
         database = db
+
 
 class hhsubindustry(Model):
     id_industry = IntegerField()
     id_sub_industry = IntegerField()
     name_sub_industry = TextField()
+
     class Meta:
         database = db
+
 
 class tvindustry(Model):
     name_industry = TextField()
     count_industry = IntegerField()
+
     class Meta:
         database = db
+
 
 class HHCompList(BaseModel):
     name = TextField(unique=True)
     tag = TextField()
 
+
 class TVcompList(BaseModel):
     name = TextField(unique=True)
     tag = TextField()
 
+
 class technology(BaseModel):
     technology = TextField(unique=True)
+
 
 # Create the tables in the database
 db.connect()
@@ -184,9 +193,7 @@ db.create_tables([Company, SearchCompany, SearchTechnology, Project,
                   Passport, Vacancy, Resume, Industry, Product, HHCompList, TVcompList,
                   hhindustry, hhsubindustry, tvindustry])
 
-
 for company in SearchCompany.select():
     company.active_parsers_count = 0
     company.parser_statuses = {}
     company.save()
-
