@@ -3,7 +3,7 @@ import re
 
 from base_parser import BaseParser
 from bs4 import BeautifulSoup
-from database import Passport, Project, Company, Product
+from database import Passport, Project, Company, Product, db
 from datetime import datetime
 from shared import should_stop
 # from playwright._impl._api_types import TimeoutError
@@ -80,7 +80,24 @@ class TadViserParser(BaseParser):
         gc.collect()
 
     async def find_all_companies(self, page, industry_name: str) -> list:
-        base_url = f"https://www.tadviser.ru/index.php/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:{clean_url_string(industry_name)}?ptype=comp_otr"
+        industry = ''
+        try:
+            conn = db
+            cursor = conn.cursor()
+            query = f"%{industry_name[0:3]}%"
+            cursor.execute("SELECT name_industry FROM tvindustry WHERE name_industry LIKE %s", (query,))
+            names = cursor.fetchall()
+            conn.close()
+            # Проверяем, есть ли хотя бы одно имя в результатах
+            if names:
+                industry = names[0][0]  # Возвращаем все имена, найденные по запросу
+            else:
+                industry = None  # Если результаты пусты, устанавливаем значение None или что-то другое по вашему усмотрению
+        except Exception as e:
+            print(f'[ERROR] Индустрия tadviser -- {e}')
+        print(f'[INFO] Индустрия tadviser -- {industry}')
+
+        base_url = f"https://www.tadviser.ru/index.php/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:{clean_url_string(industry)}?ptype=comp_otr"
         current_page = 0
         companies = []
 
@@ -173,9 +190,12 @@ class TadViserParser(BaseParser):
             passport_entry = Passport.get_or_none(Passport.project_name == passport_data['project_name'])
             if not passport_entry:
                 passport_entry = Passport(**passport_data)
+                print('[INFO] ДОБАВИЛ НОВУЮ ЗАПИСЬ В БД PASSPORT')
             else:
                 for key, value in passport_data.items():
                     setattr(passport_entry, key, value)
+                    print(f'{key}: {value}')
+                print('[INFO] ОБНОВИЛ ЗАПИСЬ В БД PASSPORT')
 
             try:
                 update_date = datetime.strptime(columns[4].text.strip(), '%Y')

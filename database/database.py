@@ -21,6 +21,7 @@ db = PooledMySQLDatabase(
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
     ssl={'ca': '/database/MySQL.pem'}
     # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
+    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
 
@@ -108,6 +109,7 @@ class Vacancy(BaseModel):
     publication_date = DateTimeField(null=True)
     source = TextField(null=True)  # hh or tadviser
     url = TextField(unique=True)
+    technology = TextField(null=True)
 
 
 class Industry(BaseModel):

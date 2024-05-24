@@ -378,8 +378,8 @@ async def start_tv_parsing(browser):
         if should_stop.is_set():
             all_companies_from_industries = []
             break
-
-        companies_for_industry = await tadv_parser.find_all_companies(page, industry.name)
+        print(industry.name)
+        companies_for_industry = await tadv_parser.find_all_companies(page, industry.name)  #
         all_companies_from_industries.extend(companies_for_industry)
 
     companies_from_search = []
@@ -464,8 +464,8 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=3306)
-    # uvicorn.run(app, host="127.0.0.1", port=5000)
+    # uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="127.0.0.1", port=5000)
 
 
 app.include_router(router)
