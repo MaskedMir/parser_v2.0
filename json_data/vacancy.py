@@ -1,14 +1,9 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import json
 from datetime import datetime
-
-from database.database import Company, Vacancy, db
-
+from database.database import db
 
 # Выполнение запроса с JOIN
-# query = (Vacancy
-#          .select(Company.name, Vacancy.title, Vacancy.description, Vacancy.source, Vacancy.technology)
-#          .join(Company, on=(Vacancy.company_id == Company.id)))
 conn = db
 cursor = conn.cursor()
 query = cursor.execute("SELECT "
@@ -26,16 +21,23 @@ query = cursor.execute("SELECT "
 names = cursor.fetchall()
 conn.close()
 # Формирование списка словарей
-vacancies_list = []
+companies_dict = {}
 for vacancy in names:
+    company_name = vacancy[0]
+    if company_name not in companies_dict:
+        companies_dict[company_name] = {
+            "company_name": company_name,
+            "vacancies": []
+        }
     vacancy_dict = {
-        "company_name": vacancy[0],
         "title": vacancy[1],
         "date": vacancy[2],
         "source": vacancy[3],
         "technology": vacancy[4]
     }
-    vacancies_list.append(vacancy_dict)
+    companies_dict[company_name]["vacancies"].append(vacancy_dict)
+vacancies_list = list(companies_dict.values())
+
 
 # Преобразование списка в JSON
 def custom_converter(o):
@@ -43,10 +45,7 @@ def custom_converter(o):
         return o.isoformat()
     raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
 
+
 vacancies_json = json.dumps(vacancies_list, ensure_ascii=False, indent=5, default=custom_converter)
 
-
-# Печать или сохранение JSON
-print(vacancies_json)
-
-
+# print(vacancies_json)
