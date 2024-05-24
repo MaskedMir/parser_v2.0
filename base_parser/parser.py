@@ -15,7 +15,7 @@ class BaseParser:
         tries = 0
         while tries < 10:
             try:
-                await page.goto(url, timeout=30000)
+                await page.goto(url, timeout=60000)
 
                 return await page.content()
             except Exception as e:
