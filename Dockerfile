@@ -19,7 +19,7 @@ COPY shared ./shared
 RUN mkdir -p ./tadv_parser
 COPY tadv_parser ./tadv_parser
 RUN mkdir -p ./templates
-COPY templates ./templates
+COPY static/templates ./templates
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config default-libmysqlclient-dev build-essential python3-dev bash

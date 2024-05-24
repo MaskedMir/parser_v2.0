@@ -33,6 +33,8 @@ def fromjson(value):
     except json.JSONDecodeError:
         return {}
 
+# Монтируем каталог статических файлов
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @router.get('/')
 def index(request: Request):
