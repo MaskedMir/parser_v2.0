@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 
 import uvicorn
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
