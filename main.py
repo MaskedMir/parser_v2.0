@@ -17,7 +17,7 @@ from starlette.responses import RedirectResponse, JSONResponse
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db, technology, hhindustry
 from hh_parser import HeadHunterParser, main_parser_hh_comp
-from json_data import vacancy
+from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
 
@@ -212,8 +212,7 @@ async def autocomplete2(query: str):
     except Exception as e:
         logging.info(e)
 
-
-@app.get("/vacancies")
+@router.get("/vacancies")
 async def get_vacancies():  # список компаний с вакансиями
     try:
         # Вызываем функцию из vacancy.py
@@ -225,6 +224,17 @@ async def get_vacancies():  # список компаний с вакансия�
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
+@router.get("/company-tv")
+async def get_company_tv():
+    try:
+        # Вызываем функцию из company-tv.py
+        company_ty_json = company_tv.company_tv_to_json()
+        # Проверяем, является ли результат корректным JSON
+        if not isinstance(company_ty_json, dict):
+            raise HTTPException(status_code=500, detail="Invalid data format from vacancy_to_json")
+        return JSONResponse(content=company_ty_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 @router.get("/start-parsing-company-hh")
 def start_():
