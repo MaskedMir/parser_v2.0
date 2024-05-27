@@ -219,7 +219,7 @@ async def autocomplete2(query: str):
 async def get_vacancies(button: str):  # список компаний с вакансиями
     try:
         # Вызываем функцию из vacancy.py
-        match(button):
+        match button:
             case "tv":
                 _json = vacancy.vacancy_to_json()
             case "hh":
