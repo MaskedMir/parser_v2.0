@@ -82,8 +82,10 @@ class Company(BaseModel):
     url = TextField()
 
 
-class SearchTechnology(BaseModel):
+class SearchTechnology(Model):
     name = TextField(unique=True)
+    class Meta:
+        database = db
 
 
 class Resume(BaseModel):

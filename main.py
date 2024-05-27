@@ -120,8 +120,11 @@ async def add_technology(technology_name: str = Form(...)):
         for name in technology_names:
             if name:
                 try:
-                    SearchTechnology.create(name=name)
-                    technology.create(technology=name)
+                    # Проверка на существование технологии
+                    existing_technology = SearchTechnology.get(name=name)
+                    if not existing_technology:
+                        SearchTechnology.create(name=name)
+                        technology.create(technology=name)
                 except IntegrityError:
                     continue
     return RedirectResponse(url="/digsearch/", status_code=303)
@@ -213,26 +216,20 @@ async def autocomplete2(query: str):
         logging.info(e)
 
 @router.get("/vacancies")
-async def get_vacancies():  # список компаний с вакансиями
+async def get_vacancies(button: str):  # список компаний с вакансиями
     try:
         # Вызываем функцию из vacancy.py
-        vacancies_json = vacancy.vacancy_to_json()
+        match(button):
+            case "tv":
+                _json = vacancy.vacancy_to_json()
+            case "hh":
+                _json = company_tv.company_tv_to_json()
+            case _:
+                raise HTTPException(status_code=500, detail="Invalid data format from button")
         # Проверяем, является ли результат корректным JSON
-        if not isinstance(vacancies_json, dict):
-            raise HTTPException(status_code=500, detail="Invalid data format from vacancy_to_json")
-        return JSONResponse(content=vacancies_json)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
-
-@router.get("/company-tv")
-async def get_company_tv():
-    try:
-        # Вызываем функцию из company-tv.py
-        company_ty_json = company_tv.company_tv_to_json()
-        # Проверяем, является ли результат корректным JSON
-        if not isinstance(company_ty_json, dict):
-            raise HTTPException(status_code=500, detail="Invalid data format from vacancy_to_json")
-        return JSONResponse(content=company_ty_json)
+        if not isinstance(_json, dict):
+            raise HTTPException(status_code=500, detail="Invalid data format vacancy or company json")
+        return JSONResponse(content=_json)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
