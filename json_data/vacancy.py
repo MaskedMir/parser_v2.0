@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
-from datetime import datetime
 from database.database import db
 
 
@@ -16,7 +14,7 @@ def vacancy_to_json():
                        "vacancy.technology "
                    "FROM "
                        "company "
-                       "INNER JOIN "
+                   "INNER JOIN "
                        "vacancy "
                    "ON "
                        "company.id = vacancy.company_id")
@@ -33,18 +31,9 @@ def vacancy_to_json():
             }
         vacancy_dict = {
             "title": vacancy[1],
-            "date": vacancy[2],
+            "date": vacancy[2].isoformat() if vacancy[2] is not None else None,
             "source": vacancy[3],
             "technology": vacancy[4]
         }
         companies_dict[company_name]["vacancies"].append(vacancy_dict)
-    # Преобразование списка в JSON
-    vacancies_list = list(companies_dict.values())
-    return json.dumps(vacancies_list, ensure_ascii=False, indent=5, default=custom_converter)
-
-
-# Преобразование даты для json
-def custom_converter(o):
-    if isinstance(o, datetime):
-        return o.isoformat()
-    raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
+    return companies_dict

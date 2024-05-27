@@ -12,11 +12,12 @@ from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from playwright.async_api import async_playwright
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, JSONResponse
 
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db, technology, hhindustry
 from hh_parser import HeadHunterParser, main_parser_hh_comp
+from json_data import vacancy
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
 
@@ -210,6 +211,20 @@ async def autocomplete2(query: str):
         return {"matches": [names[name][0] for name in range(5)]}
     except Exception as e:
         logging.info(e)
+
+
+@app.get("/vacancies")
+async def get_vacancies():  # список компаний с вакансиями
+    try:
+        # Вызываем функцию из vacancy.py
+        vacancies_json = vacancy.vacancy_to_json()
+        # Проверяем, является ли результат корректным JSON
+        if not isinstance(vacancies_json, dict):
+            raise HTTPException(status_code=500, detail="Invalid data format from vacancy_to_json")
+        return JSONResponse(content=vacancies_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+
 
 @router.get("/start-parsing-company-hh")
 def start_():
