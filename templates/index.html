@@ -495,7 +495,6 @@ color: #fff;
     padding: 0px 16px 0px 0px;
     flex: none;
     order: 0;
-    flex-grow: 0;
     margin: 0px 0px;
     border: 1px solid rgb(65, 73, 112);
     background: rgb(56, 61, 86);
@@ -509,7 +508,6 @@ color: #fff;
 
 .parent-string {
     height: 36px;
-    border: 1px solid red;
     color: rgb(121, 133, 153);
     font-family: Roboto;
     font-size: 14px;
@@ -518,14 +516,20 @@ color: #fff;
     letter-spacing: 0%;
     text-align: left;
     padding: 10px 32px 10px;
+    cursor: pointer;
+    border-bottom: 2px dashed rgb(65, 73, 112);
 }
 
 .drop-down::before {
     content: url("{{ url_for('static', path='/icon/drop-down.svg') }}");
+    /* content: url(/static/icon/drop-down.svg); */
+    margin-right: 10px;
 }
 
 .list {
     display: flex;
+    opacity: 1;
+    overflow: hidden;
 }
 
 .parent-company {
@@ -533,7 +537,7 @@ color: #fff;
     height: 32px;
     display: flex;
     align-items: center;
-    padding-left: 16px;
+    padding-left: 56px;
 
 }
 
@@ -554,6 +558,8 @@ color: #fff;
     display: flex;
     align-items: center;
     padding-left: 16px;
+    flex-grow: 1;
+    /* overflow: auto; */
 }
 
 /* Main */
@@ -575,7 +581,7 @@ color: #fff;
                 <span id="restart-icon" style="display: none;">⚠️</span>
             </fieldset>
         </form>
-
+        
         <h2>Список компаний</h2>
         <form action="/digsearch/add_company" method="post">
             <fieldset class="list-of-companies">
@@ -711,8 +717,9 @@ color: #fff;
         </div>
         <div class="main__table-body">
             <div class="table-container">
-                <div class="parent-string">
-                    <span class="drop-down"></span>
+                <!-- <div class="parent-string">
+                    <div class="drop-down"></div>
+                    <div class="title-company"></div>
                     Газпром (количество вакансий 23)
                 </div>
                 <div class="list">
@@ -731,7 +738,7 @@ color: #fff;
                     <div class="parent-technology">
                         JS
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         </div>
@@ -977,6 +984,66 @@ function run_parser_hh_comp() {
             mask.classList.toggle('label__mask_active');
              });
     });
+
+    // Данные из JSON для контента
+
+    const tableContainer = document.querySelector('.table-container');
+   
+    fetch('/test.json')
+  .then(response => response.json())
+  .then(data => {
+    data.forEach(company => {
+        const parentString = document.createElement('div');
+        parentString.className = 'parent-string';
+        tableContainer.appendChild(parentString);
+
+        const dropDown = document.createElement('span');
+        dropDown.className = 'drop-down';
+
+        const titleCompany = document.createElement('span');
+        titleCompany.className = 'title-company';
+        parentString.appendChild(dropDown);
+        parentString.appendChild(titleCompany);
+        
+       
+      company.vacancies.forEach(vacancy => {
+        
+        const list = document.createElement('div');
+        list.className = 'list';
+
+        titleCompany.textContent = company.company_name;
+        parentString.insertAdjacentElement('afterEnd', list);
+
+        const parentCompany = document.createElement('div');
+        parentCompany.className = 'parent-company';
+        list.appendChild(parentCompany);
+
+        const parentVacancy = document.createElement('div');
+        parentVacancy.className = 'parent-vacancy';
+        list.appendChild(parentVacancy);
+
+        const parentDate = document.createElement('div');
+        parentDate.className = 'parent-date';
+        list.appendChild(parentDate);
+
+        const parentSource = document.createElement('div');
+        parentSource.className = 'parent-source';
+        list.appendChild(parentSource);
+
+        const parentTechnology = document.createElement('div');
+        parentTechnology.className = 'parent-technology';
+        list.appendChild(parentTechnology);
+        parentCompany.textContent = company.company_name;
+        parentVacancy.textContent = vacancy.title;
+        parentDate.textContent = vacancy.date;
+        parentSource.textContent = vacancy.source;
+        parentTechnology.textContent = vacancy.technology;
+      });
+    });
+  });
+
+    
+
 </script>
 
 </body>
