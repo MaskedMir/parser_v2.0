@@ -13,11 +13,12 @@ from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from playwright.async_api import async_playwright
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, JSONResponse
 
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
     Industry, Product, db, technology, hhindustry
 from hh_parser import HeadHunterParser, main_parser_hh_comp
+from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
 
@@ -122,8 +123,11 @@ async def add_technology(technology_name: str = Form(...)):
         for name in technology_names:
             if name:
                 try:
-                    SearchTechnology.create(name=name)
-                    technology.create(technology=name)
+                    # Проверка на существование технологии
+                    existing_technology = SearchTechnology.get(name=name)
+                    if not existing_technology:
+                        SearchTechnology.create(name=name)
+                        technology.create(technology=name)
                 except IntegrityError:
                     continue
     return RedirectResponse(url="/digsearch/", status_code=303)
@@ -213,6 +217,24 @@ async def autocomplete2(query: str):
         return {"matches": [names[name][0] for name in range(5)]}
     except Exception as e:
         logging.info(e)
+
+@router.get("/vacancies")
+async def get_vacancies(button: str):  # список компаний с вакансиями
+    try:
+        # Вызываем функцию из vacancy.py
+        match button:
+            case "tv":
+                _json = vacancy.vacancy_to_json()
+            case "hh":
+                _json = company_tv.company_tv_to_json()
+            case _:
+                raise HTTPException(status_code=500, detail="Invalid data format from button")
+        # Проверяем, является ли результат корректным JSON
+        if not isinstance(_json, dict):
+            raise HTTPException(status_code=500, detail="Invalid data format vacancy or company json")
+        return JSONResponse(content=_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
 
 @router.get("/start-parsing-company-hh")
 def start_():
@@ -467,8 +489,8 @@ async def run_parsers():
 
 
 def start_server():
-    # uvicorn.run(app, host="0.0.0.0", port=5000)
-    uvicorn.run(app, host="127.0.0.1", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
+    # uvicorn.run(app, host="127.0.0.1", port=5000)
 
 
 app.include_router(router)

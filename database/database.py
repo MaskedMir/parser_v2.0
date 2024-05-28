@@ -19,11 +19,7 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl={'ca': r'C:\Users\Denis\PycharmProjects\pythonProject\dig-search-develop_2\database\MySQL.pem'}
-
-    # ssl={'ca': '/database/MySQL.pem'}
-    # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop\database\MySQL.pem'}
-    # ssl={'ca': r'C:\Users\max16\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
+    ssl={'ca': '/database/MySQL.pem'}
 )
 
 
@@ -84,8 +80,10 @@ class Company(BaseModel):
     url = TextField()
 
 
-class SearchTechnology(BaseModel):
+class SearchTechnology(Model):
     name = TextField(unique=True)
+    class Meta:
+        database = db
 
 
 class Resume(BaseModel):
