@@ -19,7 +19,7 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-    ssl={'ca': '/database/MySQL.pem'}
+    ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
 )
 
 

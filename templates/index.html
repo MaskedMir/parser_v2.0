@@ -136,7 +136,7 @@ h2 {
     line-height: 20px;
     color: #B8BFCC;
     box-sizing: border-box;
-    /*overflow: hidden;*/
+    overflow: hidden;
 }
 
 
@@ -363,7 +363,15 @@ input {
     border-radius: 10px;
     background: rgb(47, 51, 73);
     flex-grow: 1;
+    max-height: 95vh;
+    overflow: hidden;
 }
+
+.table-container {
+    overflow: auto;
+    max-height: 80vh;
+}
+
 
 *::-webkit-scrollbar {
   width: 3px; /* Ширина всего элемента навигации */
@@ -448,6 +456,7 @@ color: #fff;
     display: flex;
 }
 
+
 .table-company {
     width: 297px;
     height: 40px;
@@ -518,6 +527,7 @@ color: #fff;
     padding: 10px 32px 10px;
     cursor: pointer;
     border-bottom: 2px dashed rgb(65, 73, 112);
+    margin-bottom: 10px;
 }
 
 .drop-down::before {
@@ -530,23 +540,27 @@ color: #fff;
     display: flex;
     opacity: 1;
     overflow: hidden;
-}
+    height: auto;
+    margin-bottom: 10px;}
 
 .parent-company {
     width: 297px;
-    height: 32px;
     display: flex;
     align-items: center;
     padding-left: 56px;
+    box-sizing: border-box;
+/* Обводка */
+    border-bottom: 1px solid rgb(65, 73, 112);
 
 }
 
 .parent-vacancy {
     width: 260px;
-    height: 32px;
     display: flex;
     align-items: center;
     padding-left: 16px;
+    border-bottom: 1px solid rgb(65, 73, 112);
+
 
 }
 
@@ -554,11 +568,12 @@ color: #fff;
 .parent-source,
 .parent-technology {
     width: 169.67px;
-    height: 32px;
     display: flex;
     align-items: center;
     padding-left: 16px;
     flex-grow: 1;
+    border-bottom: 1px solid rgb(65, 73, 112);
+
     /* overflow: auto; */
 }
 
@@ -987,12 +1002,13 @@ function run_parser_hh_comp() {
 
     // Данные из JSON для контента
 
-    const tableContainer = document.querySelector('.table-container');
-   
-    fetch('/digsearch/vacancies')
-  .then(response => response.json())
-  .then(data => {
-    data.forEach(company => {
+const tableContainer = document.querySelector('.table-container');
+
+async function fetchData() { 
+    const response = await fetch('/digsearch/vacancies');
+    const data = await response.json();
+
+    for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
         parentString.className = 'parent-string';
         tableContainer.appendChild(parentString);
@@ -1004,45 +1020,43 @@ function run_parser_hh_comp() {
         titleCompany.className = 'title-company';
         parentString.appendChild(dropDown);
         parentString.appendChild(titleCompany);
-        
-       
-      company.vacancies.forEach(vacancy => {
-        
+        titleCompany.textContent = companyName;
+
+    companyData.vacancies.forEach(vacancy => {
         const list = document.createElement('div');
         list.className = 'list';
-
-        titleCompany.textContent = company.company_name;
-        parentString.insertAdjacentElement('afterEnd', list);
+        parentString.insertAdjacentElement('afterEnd',list);
 
         const parentCompany = document.createElement('div');
         parentCompany.className = 'parent-company';
         list.appendChild(parentCompany);
+        parentCompany.textContent = companyName;
 
         const parentVacancy = document.createElement('div');
         parentVacancy.className = 'parent-vacancy';
         list.appendChild(parentVacancy);
+        parentVacancy.textContent = vacancy.title;
 
         const parentDate = document.createElement('div');
         parentDate.className = 'parent-date';
         list.appendChild(parentDate);
+        parentDate.textContent = vacancy.date;
 
         const parentSource = document.createElement('div');
         parentSource.className = 'parent-source';
         list.appendChild(parentSource);
+        parentSource.textContent = vacancy.source;
 
         const parentTechnology = document.createElement('div');
         parentTechnology.className = 'parent-technology';
         list.appendChild(parentTechnology);
-        parentCompany.textContent = company.company_name;
-        parentVacancy.textContent = vacancy.title;
-        parentDate.textContent = vacancy.date;
-        parentSource.textContent = vacancy.source;
         parentTechnology.textContent = vacancy.technology;
-      });
     });
-  });
+}
+}
 
-    
+fetchData();
+
 
 </script>
 

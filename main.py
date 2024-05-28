@@ -38,6 +38,7 @@ def fromjson(value):
 # Монтируем каталог статических файлов
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 @router.get('/')
 def index(request: Request):
     search_list = SearchCompany.select()
@@ -212,6 +213,20 @@ async def autocomplete2(query: str):
         cursor = conn.cursor()
         query = f"%{query}%"
         cursor.execute("SELECT name_industry FROM hhindustry WHERE name_industry LIKE %s", (query,))
+        names = cursor.fetchall()
+        conn.close()
+        return {"matches": [names[name][0] for name in range(5)]}
+    except Exception as e:
+        logging.info(e)
+
+
+@router.get("/autocomplete4")
+async def autocomplete2(query: str):
+    try:
+        conn = db
+        cursor = conn.cursor()
+        query = f"%{query}%"
+        cursor.execute("SELECT name FROM company WHERE name LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
         return {"matches": [names[name][0] for name in range(5)]}
