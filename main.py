@@ -223,7 +223,7 @@ async def autocomplete2(query: str):
 async def get_vacancies(query: str):  # список компаний с вакансиями
     _json = vacancy.vacancy_to_json()
     filtered_json = {company_name: company_data for company_name, company_data in _json.items()
-                     if query.lower() in company_name.lower()}
+                     if query.lower() == company_name.lower()}
 
     return JSONResponse(content=filtered_json)
 
