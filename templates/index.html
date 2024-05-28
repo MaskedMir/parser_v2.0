@@ -1084,6 +1084,8 @@ let result = document.querySelector('.search-form');
 async function fetchData() { 
     const response = await fetch(`/digsearch/vacancies?query=${result.value}`);
     const data = await response.json();
+    tableContainer.textContent ='';
+
     for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
         
