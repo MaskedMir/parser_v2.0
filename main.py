@@ -8,6 +8,7 @@ import time
 from datetime import datetime
 
 import uvicorn
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -34,6 +35,8 @@ def fromjson(value):
     except json.JSONDecodeError:
         return {}
 
+# Монтируем каталог статических файлов
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @router.get('/')
 def index(request: Request):
