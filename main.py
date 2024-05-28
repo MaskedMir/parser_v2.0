@@ -219,6 +219,14 @@ async def autocomplete2(query: str):
     except Exception as e:
         logging.info(e)
 
+@router.get("/vacancies")
+async def get_vacancies(query: str):  # список компаний с вакансиями
+    _json = vacancy.vacancy_to_json()
+    filtered_json = {company_name: company_data for company_name, company_data in _json.items()
+                     if query.lower() in company_name.lower()}
+
+    return JSONResponse(content=filtered_json)
+
 
 @router.get("/autocomplete4")
 async def autocomplete2(query: str):
@@ -232,11 +240,6 @@ async def autocomplete2(query: str):
         return {"matches": [names[name][0] for name in range(5)]}
     except Exception as e:
         logging.info(e)
-
-@router.get("/vacancies")
-async def get_vacancies():  # список компаний с вакансиями
-    _json = vacancy.vacancy_to_json()
-    return JSONResponse(content=_json)
 
 @router.get("/start-parsing-company-hh")
 def start_():
@@ -492,7 +495,6 @@ async def run_parsers():
 
 def start_server():
     uvicorn.run(app, host="0.0.0.0", port=3306)
-    # uvicorn.run(app, host="127.0.0.1", port=5000)
 
 
 app.include_router(router)
