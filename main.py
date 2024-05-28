@@ -219,22 +219,13 @@ async def autocomplete2(query: str):
         logging.info(e)
 
 @router.get("/vacancies")
-async def get_vacancies(button: str):  # список компаний с вакансиями
-    try:
-        # Вызываем функцию из vacancy.py
-        match button:
-            case "tv":
-                _json = vacancy.vacancy_to_json()
-            case "hh":
-                _json = company_tv.company_tv_to_json()
-            case _:
-                raise HTTPException(status_code=500, detail="Invalid data format from button")
-        # Проверяем, является ли результат корректным JSON
-        if not isinstance(_json, dict):
-            raise HTTPException(status_code=500, detail="Invalid data format vacancy or company json")
-        return JSONResponse(content=_json)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+async def get_vacancies(query: str):  # список компаний с вакансиями
+    _json = vacancy.vacancy_to_json()
+    filtered_json = {company_name: company_data for company_name, company_data in _json.items()
+                     if query.lower() in company_name.lower()}
+
+    return JSONResponse(content=filtered_json)
+
 
 @router.get("/start-parsing-company-hh")
 def start_():
@@ -489,8 +480,8 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=3306)
-    # uvicorn.run(app, host="127.0.0.1", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
+    # uvicorn.run(app, host="0.0.0.0", port=3306)
 
 
 app.include_router(router)

@@ -26,7 +26,6 @@ def vacancy_to_json():
         company_name = vacancy[0]
         if company_name not in companies_dict:
             companies_dict[company_name] = {
-                "company_name": company_name,
                 "vacancies": []
             }
         vacancy_dict = {

@@ -26,7 +26,6 @@ def company_tv_to_json():
         company_name = company[0]
         if company_name not in companies_dict:
             companies_dict[company_name] = {
-                "company_name": company_name,
                 "passport": []
             }
         passport_dict = {
