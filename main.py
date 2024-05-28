@@ -219,22 +219,9 @@ async def autocomplete2(query: str):
         logging.info(e)
 
 @router.get("/vacancies")
-async def get_vacancies(button: str):  # список компаний с вакансиями
-    try:
-        # Вызываем функцию из vacancy.py
-        match button:
-            case "tv":
-                _json = vacancy.vacancy_to_json()
-            case "hh":
-                _json = company_tv.company_tv_to_json()
-            case _:
-                raise HTTPException(status_code=500, detail="Invalid data format from button")
-        # Проверяем, является ли результат корректным JSON
-        if not isinstance(_json, dict):
-            raise HTTPException(status_code=500, detail="Invalid data format vacancy or company json")
-        return JSONResponse(content=_json)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+async def get_vacancies():  # список компаний с вакансиями
+    _json = vacancy.vacancy_to_json()
+    return JSONResponse(content=_json)
 
 @router.get("/start-parsing-company-hh")
 def start_():
