@@ -989,7 +989,7 @@ function run_parser_hh_comp() {
 
     const tableContainer = document.querySelector('.table-container');
    
-    fetch('/test.json')
+    fetch('/digsearch/vacancies')
   .then(response => response.json())
   .then(data => {
     data.forEach(company => {
