@@ -1,0 +1,297 @@
+.processing-icon {
+    margin-left: 5px;
+}
+
+.parser-count {
+    font-size: 0.9em;
+    color: #888;
+    margin-left: 3px;
+}
+
+.green-check {
+    color: green;
+}
+
+#autocomplete-list {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 30px;
+    left: 0;
+    width: 100%;
+}
+
+.autocomplete-list--disable {
+    display: none;
+    overflow: hidden;
+}
+
+#autocomplete-list div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+#autocomplete-list div:hover {
+    background-color: #e9e9e9;
+}
+
+#autocomplete-list-3 {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 30px;
+    left: 0;
+    width: 100%;
+}
+
+.autocomplete-list--disable {
+    display: none;
+    overflow: hidden;
+}
+
+#autocomplete-list-3 div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+#autocomplete-list-3 div:hover {
+    background-color: #e9e9e9;
+}
+
+#autocomplete-list-2 {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 30px;
+    left: 0;
+    width: 100%;
+}
+
+.autocomplete-list--disable {
+    display: none;
+    overflow: hidden;
+}
+
+#autocomplete-list-2 div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+#autocomplete-list-2 div:hover {
+    background-color: #e9e9e9;
+}
+
+#search-results {
+    margin-top: 20px;
+}
+
+.list-of-companies {
+    border: none;
+    position: relative;
+    padding: 0;
+    display: flex;
+    gap: 5px;
+    height: 32px;
+}
+
+html {
+    box-sizing: border-box;
+}
+
+.page {
+    padding: 0;
+    margin: 0;
+    background-color: #24283A;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #B8BFCC;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100vh;
+}
+
+
+/* Main */
+.main {
+    display: grid;
+    grid-template-columns: 350px 1111px 399px;
+    grid-template-rows: 907px 50px;
+    gap: 20px;
+}
+
+.options {
+    grid-row: 1/4;
+    padding: 16px;
+    background-color: #2F3349;
+    border-right: 1px solid #424A74;
+}
+
+.options__title {
+    font-size: 20px;
+    line-height: 26px;
+    color: #FFFFFF;
+    padding: 0;
+    margin: 0;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    height: 32px;
+    border: 0;
+    background-color: #383D56;
+    outline: 1px solid #414970;
+    border-radius: 6px;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    padding: 7.5px 8px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    color: #B8BFCC;
+}
+
+
+.search-input-2 {
+    width: 100%;
+    border: 0;
+    background-color: #383D56;
+    outline: 1px solid #414970;
+    border-radius: 6px;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    padding: 7.5px 8px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    color: #B8BFCC;
+    height: 32px;
+
+}
+
+.search-input-3 {
+    width: 100%;
+    border: 0;
+    background-color: #383D56;
+    outline: 1px solid #414970;
+    border-radius: 6px;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    padding: 7.5px 8px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    color: #B8BFCC;
+    height: 32px;
+
+}
+
+.setting__list {
+    margin: 0;
+    padding: 0;
+    max-height: 402px;
+    overflow: auto;
+    margin-bottom: 36px;
+}
+
+.setting__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 16px 6px 8px;
+    border-bottom: 1px solid #414970;
+}
+
+.label {
+    display: flex;
+    gap: 0 20px;
+    width: 100%;
+    justify-content: start;
+}
+
+.label__mask {
+    display: block;
+    width: 16px;
+    height: 16px;
+    outline: 1px solid #414970;
+    background-color: #B8BFCC;
+    position: relative;
+    border-radius: 3px;
+}
+
+.label__name {
+    margin-right: auto;
+}
+
+.label__checkbox[type="checkbox"]:checked + .label__mask::before {
+    content: "";
+    position: absolute;
+    background-image: url("assets/icon/checkbox.svg");
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    white-space: nowrap;
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+.list-of-companies__btn {
+    flex-basis: 80px;
+    color: #B8BFCC;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.btn {
+    border: none;
+    background-color: #383D56;
+    outline: 1px solid #424A74;
+    border-radius: 3px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 14px;
+    color: #B8BFCC;
+    border-radius: 6px;
+    height: 32px;
+}
+
+.delete {
+    text-decoration: none;
+    justify-self: end;
+}
+
+/* Main */
