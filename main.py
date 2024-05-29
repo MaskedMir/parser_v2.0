@@ -21,7 +21,7 @@ from hh_parser import HeadHunterParser, main_parser_hh_comp
 from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
-
+from hh_parser.parser import min_vac_count
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
 templates = Jinja2Templates(directory="templates")
@@ -175,6 +175,7 @@ async def toggle_parser():
     else:
         global should_restart
         should_restart = True
+    min_vac_count(7)
 
     return RedirectResponse(url="/digsearch/", status_code=303)
 
@@ -188,7 +189,10 @@ async def autocomplete(query: str):
         cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
@@ -202,7 +206,10 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT technology FROM technology WHERE technology LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
@@ -215,7 +222,10 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT name_industry FROM hhindustry WHERE name_industry LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
@@ -237,15 +247,16 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT name FROM company WHERE name LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
-@router.get("/start-parsing-company-hh")
+@router.get("/start-parsing-company")
 def start_():
     main_parser_hh_comp()
-@router.get("/start-parsing-company-tv")
-def start_():
     main_parser_tv_comp()
 
 

@@ -1,10 +1,10 @@
 import gc
 import re
-import playwright
-
 from datetime import datetime, date
-from base_parser import BaseParser
+
 from bs4 import BeautifulSoup
+
+from base_parser import BaseParser
 from database import Resume, Vacancy, Company, SearchTechnology
 from shared import should_stop
 
@@ -12,7 +12,13 @@ from shared import should_stop
 
 
 should_continue = True
-
+n = int
+def min_vac_count(query):
+    global n
+    if query:
+        n = int(query)
+    else:
+        n = 1
 
 def clean_url_string(s):
     s = s.replace(' ', '+')
@@ -79,10 +85,10 @@ class HeadHunterParser(BaseParser):
             result_text = ""
             print("[INFO] ПАРСЕР КОМПАНИИ", company_name, clean_url_string(company_name), company_url)
 
-            resume_url = self.resume_head + clean_url_string(company_name) + self.resume_tail   # Ссылка на резюме
+            resume_url = self.resume_head + clean_url_string(company_name) + self.resume_tail  # Ссылка на резюме
 
             if company_url is None:
-                company_url = await self.find_company_url(page, company_name)   # Ищем компанию если не указана
+                company_url = await self.find_company_url(page, company_name)  # Ищем компанию если не указана
 
             print("URL", company_url)
 
@@ -96,7 +102,6 @@ class HeadHunterParser(BaseParser):
         await self.close(page)
 
         gc.collect()
-
 
     async def find_company_url(self, page, company_name: str) -> str:
         base_url = f"https://hh.ru/employers_list?query={clean_url_string(company_name)}"
@@ -266,7 +271,7 @@ class HeadHunterParser(BaseParser):
 
     async def parse_company_url(self, url, page):
         global should_continue
-
+        global n
         print("PARSE COMPANY", url)
         html_content = await self.get_page_content(url, page)
         if html_content is None:
@@ -350,36 +355,41 @@ class HeadHunterParser(BaseParser):
 
                     print("VAC COUNT", len(vacancy_items))
 
-                    local_page = await self.get_new_page()
-                    for item in vacancy_items:
-                        if not should_continue:
-                            return
+                    # Проверка на глубину парсинга
 
-                        # Находим элемент с атрибутом data-qa="vacancy-serp__vacancy-title" и извлекаем значение атрибута href
-                        vacancy_title = item.find('a', {'data-qa': 'vacancy-serp__vacancy-title'})
-                        if vacancy_title:
-                            vac_data = await self.parse_vacancy_url(vacancy_title['href'], local_page)
+                    if len(vacancy_items) >= n:
+                        local_page = await self.get_new_page()
+                        for item in vacancy_items:
+                            if not should_continue:
+                                return
 
-                            if vac_data is None:
-                                continue
+                            # Находим элемент с атрибутом data-qa="vacancy-serp__vacancy-title" и извлекаем значение атрибута href
+                            vacancy_title = item.find('a', {'data-qa': 'vacancy-serp__vacancy-title'})
+                            if vacancy_title:
+                                vac_data = await self.parse_vacancy_url(vacancy_title['href'], local_page)
 
-                            print("VACANCY GET")
+                                if vac_data is None:
+                                    continue
 
-                            vacancy = Vacancy.get_or_none(Vacancy.url == vac_data['url'])
-                            if not vacancy:
-                                main_name = self.find_main_company_name(self.company_name)
-                                company, created = Company.get_or_create(name=self.company_name if main_name is None else main_name)
+                                print("VACANCY GET")
 
-                                vac_data["company"] = company
-                                vacancy = Vacancy(**vac_data)
-                                vacancy.save()
-                            else:
-                                query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
-                                query.execute()
-                                print(f'[TEST] Update Vacancy')
+                                vacancy = Vacancy.get_or_none(Vacancy.url == vac_data['url'])
+                                if not vacancy:
+                                    main_name = self.find_main_company_name(self.company_name)
+                                    company, created = Company.get_or_create(
+                                        name=self.company_name if main_name is None else main_name)
 
-                    await local_page.close()
+                                    vac_data["company"] = company
+                                    vacancy = Vacancy(**vac_data)
+                                    vacancy.save()
+                                else:
+                                    query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
+                                    query.execute()
+                                    print(f'[TEST] Update Vacancy')
 
+                        await local_page.close()
+                    else:
+                        print("COUN VAC < N")
                 if should_stop.is_set():
                     return {}
         else:
@@ -388,38 +398,40 @@ class HeadHunterParser(BaseParser):
             vacancy_items = title_soup.find_all('div', class_='vacancy-list-item')
 
             print("VAC COUNT", len(vacancy_items))
+            # Проверка на глубину парсинга
+            if len(vacancy_items) >= n:
+                local_page = await self.get_new_page()
+                for item in vacancy_items:
+                    if not should_continue:
+                        return
 
-            local_page = await self.get_new_page()
-            for item in vacancy_items:
-                if not should_continue:
-                    return
+                    # Находим элемент с атрибутом data-qa="vacancy-serp__vacancy-title" и извлекаем значение атрибута href
+                    vacancy_title = item.find('a', {'data-qa': 'vacancy-serp__vacancy-title'})
+                    if vacancy_title:
+                        vac_data = await self.parse_vacancy_url(vacancy_title['href'], local_page)
 
-                # Находим элемент с атрибутом data-qa="vacancy-serp__vacancy-title" и извлекаем значение атрибута href
-                vacancy_title = item.find('a', {'data-qa': 'vacancy-serp__vacancy-title'})
-                if vacancy_title:
-                    vac_data = await self.parse_vacancy_url(vacancy_title['href'], local_page)
+                        if vac_data is None:
+                            continue
 
-                    if vac_data is None:
-                        continue
+                        print("VACANCY GET")
 
-                    print("VACANCY GET")
+                        vacancy = Vacancy.get_or_none(Vacancy.url == vac_data['url'])
+                        if not vacancy:
+                            main_name = self.find_main_company_name(self.company_name)
+                            company, created = Company.get_or_create(
+                                name=self.company_name if main_name is None else main_name)
 
-                    vacancy = Vacancy.get_or_none(Vacancy.url == vac_data['url'])
-                    if not vacancy:
-                        main_name = self.find_main_company_name(self.company_name)
-                        company, created = Company.get_or_create(
-                            name=self.company_name if main_name is None else main_name)
+                            vac_data["company"] = company
+                            vacancy = Vacancy(**vac_data)
+                            vacancy.save()
+                        else:
+                            query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
+                            query.execute()
+                            print(f'[TEST] Update Vacancy')
 
-                        vac_data["company"] = company
-                        vacancy = Vacancy(**vac_data)
-                        vacancy.save()
-                    else:
-                        query = Vacancy.update(**vac_data).where(Vacancy.url == vac_data["url"])
-                        query.execute()
-                        print(f'[TEST] Update Vacancy')
-
-            await local_page.close()
-
+                await local_page.close()
+            else:
+                print("COUN VAC < N")
         return
 
     async def parse_resumes(self, url, page):
@@ -499,7 +511,8 @@ class HeadHunterParser(BaseParser):
                                 setattr(resume, key, value)
 
                         main_name = self.find_main_company_name(self.company_name)
-                        company, created = Company.get_or_create(name=self.company_name if main_name is None else main_name)
+                        company, created = Company.get_or_create(
+                            name=self.company_name if main_name is None else main_name)
                         resume.company = company
                         resume.save()
 
