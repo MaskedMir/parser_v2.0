@@ -785,7 +785,7 @@ cursor: pointer;
             <fieldset class="main__search-block">
                 <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
                 <div id="autocomplete-list-4"></div>
-                <input class="date-form" type="date" placeholder="Период">
+                <input class="date-form" type="date" placeholder="Период" value="">
                 <button class="search-btn" type="button" onclick="fetchData()">Найти</button>
 
             </fieldset>
@@ -1114,7 +1114,7 @@ async function fetchData() {
     const response = await fetch(`/digsearch/vacancies?query=${result.value}`);
     // const response = await fetch('test.json');
     const data = await response.json();
-    tableContainer.textContent = '';
+    // tableContainer.textContent = '';
     console.log(data)
     for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
@@ -1183,6 +1183,14 @@ document.addEventListener('click', function (event) {
             autocompleteList4.classList.add('autocomplete-list--disable')
         }
     });
+
+
+    const dateForm = document.querySelector('.date-form');
+
+    document.addEventListener('click', () => {
+        console.log(dateForm.value);
+    })
+    
 
 
 </script>
