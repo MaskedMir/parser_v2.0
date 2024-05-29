@@ -21,7 +21,7 @@ from hh_parser import HeadHunterParser, main_parser_hh_comp
 from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
-
+from hh_parser.parser import min_vac_count
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
 templates = Jinja2Templates(directory="templates")
@@ -34,6 +34,7 @@ def fromjson(value):
         return json.loads(value)
     except json.JSONDecodeError:
         return {}
+
 
 # Монтируем каталог статических файлов
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -175,6 +176,7 @@ async def toggle_parser():
     else:
         global should_restart
         should_restart = True
+    min_vac_count(7)
 
     return RedirectResponse(url="/digsearch/", status_code=303)
 
@@ -188,7 +190,10 @@ async def autocomplete(query: str):
         cursor.execute("SELECT name FROM hhcomplist WHERE name LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
@@ -202,9 +207,13 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT technology FROM technology WHERE technology LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
+
 
 @router.get("/autocomplete3")
 async def autocomplete2(query: str):
@@ -215,17 +224,24 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT name_industry FROM hhindustry WHERE name_industry LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
-@router.get("/vacancies")
-async def get_vacancies(query: str):  # список компаний с вакансиями
-    _json = vacancy.vacancy_to_json()
-    filtered_json = {company_name: company_data for company_name, company_data in _json.items()
-                     if query.lower() == company_name.lower()}
 
-    return JSONResponse(content=filtered_json)
+@router.get("/vacancies")
+async def get_vacancies(query: str, date: str = None, dtype: str = "hh"):  # список компаний с вакансиями
+    date = f'{date}T00:00:00' if date else None    # = "2024-04-24T00:00:00"
+    if dtype == "tv":
+        _json = company_tv.company_tv_to_json(query, date)
+        return JSONResponse(content=_json)
+    elif dtype == "hh":
+        _json = vacancy.vacancy_to_json(query, date)
+        return JSONResponse(content=_json)
+    raise " switcher type does not exist "
 
 
 @router.get("/autocomplete4")
@@ -237,15 +253,16 @@ async def autocomplete2(query: str):
         cursor.execute("SELECT name FROM company WHERE name LIKE %s", (query,))
         names = cursor.fetchall()
         conn.close()
-        return {"matches": [names[name][0] for name in range(5)]}
+        if len(names) >= 5:
+            return {"matches": [names[name][0] for name in range(5)]}
+        else:
+            return {"matches": [names]}
     except Exception as e:
         logging.info(e)
 
-@router.get("/start-parsing-company-hh")
+@router.get("/start-parsing-company")
 def start_():
     main_parser_hh_comp()
-@router.get("/start-parsing-company-tv")
-def start_():
     main_parser_tv_comp()
 
 
@@ -318,33 +335,40 @@ def show_technologies_all_fields(company_id):
 
 
 async def start_hh_parsing(browser):
-    print("start_hh_parsing")
+    logging.info("START HH PARSING")
     hh_parser = HeadHunterParser(browser)
 
-    page = await hh_parser.get_new_page()
+    page = await hh_parser.get_new_page()  # 1 этап: поиск ссылок на компании и вакансии
 
     all_companies_from_industries = []
-    for industry in Industry.select():
+    for industry in Industry.select():  # создает список отраслей из поиска: поля - id, name
         if should_stop.is_set():
             all_companies_from_industries = []
             break
 
-        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)
+        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)  # ищет ссылки
         all_companies_from_industries.extend(companies_for_industry)
 
     companies_from_search = []
-    for search_item in SearchCompany.select():
+    for search_item in SearchCompany.select():  # создает список искомых компаний: поля - id, name
         if should_stop.is_set():
             companies_from_search = []
             break
 
-        company_url = await hh_parser.find_company_url(page, search_item.company_name)
+        company_url = await hh_parser.find_company_url(page, search_item.company_name)  # ищет ссылки
         if company_url:
             companies_from_search.append({"url": company_url, "name": search_item.company_name})
 
-    await page.close()
+    await page.close()  # завершение 1 этапа
 
-    combined_list = all_companies_from_industries + companies_from_search
+    # если в поиске присутствуют индустрии, то осуществляется парсинг только по индустрии
+    # реализованно из-за залипания парсера за предел в 30 секунд
+    if all_companies_from_industries:
+        combined_list = all_companies_from_industries
+        logging.info("START HH PARSING INDUSTRY")
+    else:
+        combined_list = companies_from_search
+        logging.info("START HH PARSING COMPANIES BY NAME")
 
     # Убираем дубликаты на основе URL
     seen = set()
@@ -494,7 +518,7 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=3306)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
 
 
 app.include_router(router)

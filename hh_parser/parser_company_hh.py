@@ -5,6 +5,8 @@ from time import time
 import logging
 
 from database.database import HHCompList
+from database.list_aggregator import list_arg
+
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(asctime)s %(message)s")
 HEADERS = {
@@ -140,3 +142,4 @@ async def main():
 
 def main_parser_hh_comp():
     asyncio.run(main())
+    list_arg()
