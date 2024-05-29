@@ -33,6 +33,24 @@
     width: 100%;
 }
 
+#autocomplete-list-4 {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 30px;
+    left: 0;
+    width: 100%;
+}
+
+#autocomplete-list-4 div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+
 .autocomplete-list--disable {
     display: none;
     overflow: hidden;
@@ -45,7 +63,8 @@
     border-bottom: 1px solid #d4d4d4;
 }
 
-#autocomplete-list div:hover {
+#autocomplete-list div:hover,
+#autocomplete-list-4 div:hover {
     background-color: #e9e9e9;
 }
 
@@ -139,6 +158,12 @@ h2 {
     overflow: hidden;
 }
 
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    /* gap: 20px; */
+    margin-bottom: 15px;
+}
 
 /* Main */
 .main {
@@ -148,7 +173,7 @@ h2 {
 
 .options {
     padding: 16px;
-    max-width: 370px;
+    max-width: 350px;
     background-color: #2F3349;
     border-right: 1px solid #424A74;
     overflow: hidden;
@@ -214,6 +239,22 @@ h2 {
     height: 32px;
     margin-bottom: 15px;
 
+}
+
+.search-form {
+    width: 100%;
+    border: 0;
+    background-color: #383D56;
+    outline: 1px solid #414970;
+    border-radius: 6px;
+    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 14px;
+    color: rgb(184, 191, 204);
+    height: 32px;
+    margin-bottom: 15px;
 }
 
 input::placeholder {
@@ -331,6 +372,7 @@ input {
     height: 32px;
     padding: 0 12px;
     cursor: pointer;
+    max-width: 145px;
 }
 
 .delete {
@@ -400,6 +442,7 @@ input {
     gap: 20px;
     border: none;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .search-form {
@@ -436,24 +479,26 @@ input[type='date']::-webkit-calendar-picker-indicator {
     filter: invert(100%);
 }
 
-.searc-btn {
+.search-btn,
+.start-stop {
 border: none;
-width: 145px;
+min-width: 145px;
 height: 32px;
 display: flex;
 flex-direction: row;
 justify-content: center;
 align-items: center;
 padding: 10px 8px 10px 8px;
-margin: 0px 8px;
 border-radius: 6px;
 box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
 background: rgb(84, 77, 175);
 color: #fff;
+cursor: pointer;
 }
 
 .main__table-title {
     display: flex;
+    margin-bottom: 10px;
 }
 
 
@@ -527,7 +572,7 @@ color: #fff;
     padding: 10px 32px 10px;
     cursor: pointer;
     border-bottom: 2px dashed rgb(65, 73, 112);
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
 }
 
 .drop-down::before {
@@ -540,8 +585,18 @@ color: #fff;
     display: flex;
     opacity: 1;
     overflow: hidden;
-    height: auto;
-    margin-bottom: 10px;}
+    min-height: 32px;
+    /* margin-bottom: 10px; */
+    padding: 5px 0 5px;
+    border-bottom: 1px solid rgb(65, 73, 112);
+}
+
+.list-container {
+   height: auto;
+   overflow: hidden;
+   transition: height 1s ease;
+}
+
 
 .parent-company {
     width: 297px;
@@ -550,7 +605,7 @@ color: #fff;
     padding-left: 56px;
     box-sizing: border-box;
 /* Обводка */
-    border-bottom: 1px solid rgb(65, 73, 112);
+    /* border-bottom: 1px solid rgb(65, 73, 112); */
 
 }
 
@@ -559,7 +614,7 @@ color: #fff;
     display: flex;
     align-items: center;
     padding-left: 16px;
-    border-bottom: 1px solid rgb(65, 73, 112);
+    /* border-bottom: 1px solid rgb(65, 73, 112); */
 
 
 }
@@ -572,9 +627,12 @@ color: #fff;
     align-items: center;
     padding-left: 16px;
     flex-grow: 1;
-    border-bottom: 1px solid rgb(65, 73, 112);
+    /* border-bottom: 1px solid rgb(65, 73, 112); */
+}
 
-    /* overflow: auto; */
+
+.close {
+    max-height: 0;
 }
 
 /* Main */
@@ -592,10 +650,15 @@ color: #fff;
         <form action="/digsearch/toggle_parser" method="post">
             <fieldset class="parser-status">
                 <a id="parser-status">Парсер остановлен</a>
-                <button id="parser-button" type="submit" class="btn">Запустить</button>
+                <button id="parser-button" type="submit" class="btn start-stop">Запустить</button>
                 <span id="restart-icon" style="display: none;">⚠️</span>
+                
             </fieldset>
         </form>
+        <div class="button-container">
+            <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
+            <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
+        </div>
         
         <h2>Список компаний</h2>
         <form action="/digsearch/add_company" method="post">
@@ -684,10 +747,6 @@ color: #fff;
             <input type="submit" value="Отобразить">
         </form>
 
-        <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
-        <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
-
-
         {% if selected_company %}
         <h2>Технологии для {{ selected_company }}</h2>
         <table border="1">
@@ -713,12 +772,15 @@ color: #fff;
     <section class="main__content">
         <div class="container">
             <!-- Добавить данные для отправки -->
-            <form action="" method="post">
+            <form action="/digsearch/autocomplete4" method="post">
             <fieldset class="main__search-block">
                 <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
+                <div id="autocomplete-list-4"></div>
                 <input class="date-form" type="date" placeholder="Период">
-                <button class="searc-btn">Найти</button>
+                <button class="search-btn" type="button" onclick="fetchData()">Найти</button>
+
             </fieldset>
+
         </form>
         <div class="main__table-title">
             <div class="table-company">
@@ -838,6 +900,39 @@ function run_parser_hh_comp() {
             });
     });
 
+    const autocompleteList4 = document.getElementById('autocomplete-list-4');
+    const searchInput4 = document.querySelector('.search-form');
+
+    searchInput4.addEventListener('click', function () {
+        autocompleteList4.classList.remove('autocomplete-list--disable');
+    })
+
+
+    searchInput4.addEventListener('input', function () {
+        const input = this.value;
+        if (!input) {
+            document.getElementById('autocomplete-list-4').innerHTML = '';
+            return;
+        }
+        fetch(`/digsearch/autocomplete4?query=${input}`)
+            .then(response => response.json())
+            .then(data => {
+                autocompleteList4.classList.remove('autocomplete-list--disable');
+                autocompleteList4.innerHTML = '';
+                data.matches.forEach(function (item) {
+                    const div = document.createElement('div');
+                    div.classList.add('autocomplete-list__item')
+                    div.textContent = item;
+                    div.addEventListener('click', function () {
+                        document.querySelector('.search-form').value = this.textContent;
+                        autocompleteList4.innerHTML = '';
+                    });
+                    autocompleteList4.appendChild(div);
+                });
+            });
+    });
+    
+    
     document.addEventListener('click', function (event) {
         if (event.target.className !== 'search-input-3' &&
             event.target.type !== 'submit' &&
@@ -1001,17 +1096,24 @@ function run_parser_hh_comp() {
     });
 
     // Данные из JSON для контента
-
 const tableContainer = document.querySelector('.table-container');
 
+let result = document.querySelector('.search-form');
+
+
 async function fetchData() { 
-    const response = await fetch('/digsearch/vacancies');
+    const response = await fetch(`/digsearch/vacancies?query=${result.value}`);
     const data = await response.json();
+    tableContainer.textContent = '';
 
     for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
+        
         parentString.className = 'parent-string';
         tableContainer.appendChild(parentString);
+        const listContainer = document.createElement('div');
+        listContainer.className = 'list-container';
+        parentString.insertAdjacentElement('afterEnd', listContainer);
 
         const dropDown = document.createElement('span');
         dropDown.className = 'drop-down';
@@ -1020,12 +1122,18 @@ async function fetchData() {
         titleCompany.className = 'title-company';
         parentString.appendChild(dropDown);
         parentString.appendChild(titleCompany);
-        titleCompany.textContent = companyName;
+        titleCompany.textContent = companyName + ' (количество вакансий ' + companyData.vacancies.length + ')';
+
+        const next = parentString.nextElementSibling;
+        parentString.addEventListener('click', () => {
+            next.classList.toggle('close');
+        })
 
     companyData.vacancies.forEach(vacancy => {
+        
         const list = document.createElement('div');
         list.className = 'list';
-        parentString.insertAdjacentElement('afterEnd',list);
+        listContainer.appendChild(list);
 
         const parentCompany = document.createElement('div');
         parentCompany.className = 'parent-company';
@@ -1040,7 +1148,7 @@ async function fetchData() {
         const parentDate = document.createElement('div');
         parentDate.className = 'parent-date';
         list.appendChild(parentDate);
-        parentDate.textContent = vacancy.date;
+        parentDate.textContent = vacancy.date.slice(0, 10);
 
         const parentSource = document.createElement('div');
         parentSource.className = 'parent-source';
@@ -1051,11 +1159,20 @@ async function fetchData() {
         parentTechnology.className = 'parent-technology';
         list.appendChild(parentTechnology);
         parentTechnology.textContent = vacancy.technology;
+
+        
     });
 }
 }
 
-fetchData();
+document.addEventListener('click', function (event) {
+        if (event.target.className !== 'search-form' &&
+            event.target.type !== 'submit' &&
+            event.target.className !== 'autocomplete-list__item'
+        ) {
+            autocompleteList4.classList.add('autocomplete-list--disable')
+        }
+    });
 
 
 </script>
