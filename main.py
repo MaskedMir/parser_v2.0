@@ -22,6 +22,7 @@ from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
 from hh_parser.parser import min_vac_count
+from database.list_aggregator import list_arg
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
 templates = Jinja2Templates(directory="templates")
@@ -169,14 +170,15 @@ def show_technologies(request: Request, selected_company: str = Form(...)):
 
 
 @router.post("/toggle_parser")
-async def toggle_parser(query: str):
+async def toggle_parser(query: str = "5"):
     global parser_running
     if parser_running:
         should_stop.set()
     else:
         global should_restart
         should_restart = True
-    min_vac_count(5)
+
+    min_vac_count(int(query))
 
     return RedirectResponse(url="/digsearch/", status_code=303)
 
@@ -264,6 +266,7 @@ async def autocomplete2(query: str):
 def start_():
     main_parser_hh_comp()
     main_parser_tv_comp()
+    list_arg()
 
 
 def search_for_technologies(text, technologies):
