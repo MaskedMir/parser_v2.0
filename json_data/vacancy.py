@@ -3,7 +3,7 @@ from database.database import db
 
 
 # Выполнение запроса с JOIN
-def vacancy_to_json(query: str, date: str):
+def vacancy_to_json(query: str, date: str = None):
     conn = db
     cursor = conn.cursor()
     cursor.execute("SELECT "
@@ -38,6 +38,8 @@ def vacancy_to_json(query: str, date: str):
             "source": vacancy[3],
             "technology": vacancy[4]
         }
-        if date != '' and date == vacancy_dict["date"]:
+        if date == vacancy_dict["date"]:
+            companies_dict[company_name]["vacancies"].append(vacancy_dict)
+        elif date is None:
             companies_dict[company_name]["vacancies"].append(vacancy_dict)
     return companies_dict
