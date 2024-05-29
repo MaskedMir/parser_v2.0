@@ -20,6 +20,8 @@ RUN mkdir -p ./tadv_parser
 COPY tadv_parser ./tadv_parser
 RUN mkdir -p ./templates
 COPY templates ./templates
+RUN mkdir -p ./json_data
+COPY json_data ./json_data
 
 ENV PYTHONPATH="/app"
 
