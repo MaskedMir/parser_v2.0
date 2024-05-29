@@ -22,6 +22,8 @@ RUN mkdir -p ./templates
 COPY templates ./templates
 RUN mkdir -p ./json_data
 COPY json_data ./json_data
+RUN mkdir -p ./static
+COPY static ./static
 
 ENV PYTHONPATH="/app"
 
