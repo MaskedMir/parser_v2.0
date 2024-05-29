@@ -24,7 +24,7 @@ def company_tv_to_json(query: str, date: str = None):
     companies_dict = {}
     for company in names:
         company_name = company[0]
-        if query.lower() == company_name.lower():
+        if query.lower() == company_name.lower() or query == "":
             if company_name not in companies_dict:
                 companies_dict[company_name] = {
                     "vacancies": []

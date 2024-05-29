@@ -16,13 +16,8 @@ db = PooledMySQLDatabase(
     host=DB_HOST,
     max_connections=10,  # максимальное количество соединений в пуле
     stale_timeout=300,  # время в секундах, через которое неиспользуемое соединение будет закрыто
-<<<<<<< HEAD
-    ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
-    # ssl={'ca': '/database/MySQL.pem'}
-=======
     # ssl={'ca': r'C:\Users\Masked\PycharmProjects\dig-search-develop_2\database\MySQL.pem'}
     ssl={'ca': '/database/MySQL.pem'}
->>>>>>> 9e28ef738bc9c53f95bd3e84f749e8df033c37aa
 )
 
 def zero_date(self):

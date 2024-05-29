@@ -169,14 +169,14 @@ def show_technologies(request: Request, selected_company: str = Form(...)):
 
 
 @router.post("/toggle_parser")
-async def toggle_parser():
+async def toggle_parser(query: str):
     global parser_running
     if parser_running:
         should_stop.set()
     else:
         global should_restart
         should_restart = True
-    min_vac_count(7)
+    min_vac_count(5)
 
     return RedirectResponse(url="/digsearch/", status_code=303)
 
@@ -518,7 +518,7 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=3306)
 
 
 app.include_router(router)
