@@ -173,7 +173,8 @@ h2 {
 
 .options {
     padding: 16px;
-    max-width: 350px;
+    width: 350px;
+    flex-shrink: 0;
     background-color: #2F3349;
     border-right: 1px solid #424A74;
     overflow: hidden;
@@ -190,7 +191,8 @@ h2 {
     margin-bottom: 20px;
 }
 
-.search-input {
+.search-input,
+.parser-depth {
     width: 100%;
     border: 0;
     background-color: #383D56;
@@ -637,6 +639,10 @@ cursor: pointer;
 
 /* Main */
 
+.parsing-depth {
+    border: none;
+}
+
     </style>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -652,13 +658,16 @@ cursor: pointer;
                 <a id="parser-status">Парсер остановлен</a>
                 <button id="parser-button" type="submit" class="btn start-stop">Запустить</button>
                 <span id="restart-icon" style="display: none;">⚠️</span>
-                
+            </fieldset>
+            <fieldset class="parsing-depth">
+                <input class="parser-depth" type="text" name="parser-depth" placeholder="Глубина">
             </fieldset>
         </form>
         <div class="button-container">
             <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
             <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
         </div>
+
         
         <h2>Список компаний</h2>
         <form action="/digsearch/add_company" method="post">
@@ -1103,12 +1112,13 @@ let result = document.querySelector('.search-form');
 
 async function fetchData() { 
     const response = await fetch(`/digsearch/vacancies?query=${result.value}`);
+    // const response = await fetch('test.json');
     const data = await response.json();
     tableContainer.textContent = '';
-
+    console.log(data)
     for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
-        
+        console.log(companyName);
         parentString.className = 'parent-string';
         tableContainer.appendChild(parentString);
         const listContainer = document.createElement('div');
@@ -1148,7 +1158,7 @@ async function fetchData() {
         const parentDate = document.createElement('div');
         parentDate.className = 'parent-date';
         list.appendChild(parentDate);
-        parentDate.textContent = vacancy.date.slice(0, 10);
+        parentDate.textContent = vacancy.date;
 
         const parentSource = document.createElement('div');
         parentSource.className = 'parent-source';
