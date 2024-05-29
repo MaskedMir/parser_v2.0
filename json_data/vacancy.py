@@ -3,7 +3,7 @@ from database.database import db
 
 
 # Выполнение запроса с JOIN
-def vacancy_to_json():
+def vacancy_to_json(query: str, date: str):
     conn = db
     cursor = conn.cursor()
     cursor.execute("SELECT "
@@ -21,9 +21,13 @@ def vacancy_to_json():
     names = cursor.fetchall()
     conn.close()
     # Формирование списка словарей
+
     companies_dict = {}
     for vacancy in names:
-        company_name = vacancy[0]
+        if query != '':
+            company_name = query
+        else:
+            company_name = vacancy[0]
         if company_name not in companies_dict:
             companies_dict[company_name] = {
                 "vacancies": []
@@ -34,5 +38,6 @@ def vacancy_to_json():
             "source": vacancy[3],
             "technology": vacancy[4]
         }
-        companies_dict[company_name]["vacancies"].append(vacancy_dict)
+        if date != '' and date == vacancy_dict["date"]:
+            companies_dict[company_name]["vacancies"].append(vacancy_dict)
     return companies_dict

@@ -35,6 +35,7 @@ def fromjson(value):
     except json.JSONDecodeError:
         return {}
 
+
 # Монтируем каталог статических файлов
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -206,6 +207,7 @@ async def autocomplete2(query: str):
     except Exception as e:
         logging.info(e)
 
+
 @router.get("/autocomplete3")
 async def autocomplete2(query: str):
     try:
@@ -219,13 +221,11 @@ async def autocomplete2(query: str):
     except Exception as e:
         logging.info(e)
 
-@router.get("/vacancies")
-async def get_vacancies(query: str):  # список компаний с вакансиями
-    _json = vacancy.vacancy_to_json()
-    filtered_json = {company_name: company_data for company_name, company_data in _json.items()
-                     if query.lower() == company_name.lower()}
 
-    return JSONResponse(content=filtered_json)
+@router.get("/vacancies")
+async def get_vacancies(query: str, date: str = "2024-04-24T00:00:00"):  # список компаний с вакансиями
+    _json = vacancy.vacancy_to_json(query, date)
+    return JSONResponse(content=_json)
 
 
 @router.get("/autocomplete4")
@@ -241,9 +241,12 @@ async def autocomplete2(query: str):
     except Exception as e:
         logging.info(e)
 
+
 @router.get("/start-parsing-company-hh")
 def start_():
     main_parser_hh_comp()
+
+
 @router.get("/start-parsing-company-tv")
 def start_():
     main_parser_tv_comp()
@@ -321,7 +324,7 @@ async def start_hh_parsing(browser):
     logging.info("START HH PARSING")
     hh_parser = HeadHunterParser(browser)
 
-    page = await hh_parser.get_new_page()   # 1 этап: поиск ссылок на компании и вакансии
+    page = await hh_parser.get_new_page()  # 1 этап: поиск ссылок на компании и вакансии
 
     all_companies_from_industries = []
     for industry in Industry.select():  # создает список отраслей из поиска: поля - id, name
@@ -329,7 +332,7 @@ async def start_hh_parsing(browser):
             all_companies_from_industries = []
             break
 
-        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)    # ищет ссылки
+        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)  # ищет ссылки
         all_companies_from_industries.extend(companies_for_industry)
 
     companies_from_search = []
