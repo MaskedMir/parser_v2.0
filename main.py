@@ -318,33 +318,40 @@ def show_technologies_all_fields(company_id):
 
 
 async def start_hh_parsing(browser):
-    print("start_hh_parsing")
+    logging.info("START HH PARSING")
     hh_parser = HeadHunterParser(browser)
 
-    page = await hh_parser.get_new_page()
+    page = await hh_parser.get_new_page()   # 1 этап: поиск ссылок на компании и вакансии
 
     all_companies_from_industries = []
-    for industry in Industry.select():
+    for industry in Industry.select():  # создает список отраслей из поиска: поля - id, name
         if should_stop.is_set():
             all_companies_from_industries = []
             break
 
-        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)
+        companies_for_industry = await hh_parser.find_all_companies(page, industry.name)    # ищет ссылки
         all_companies_from_industries.extend(companies_for_industry)
 
     companies_from_search = []
-    for search_item in SearchCompany.select():
+    for search_item in SearchCompany.select():  # создает список искомых компаний: поля - id, name
         if should_stop.is_set():
             companies_from_search = []
             break
 
-        company_url = await hh_parser.find_company_url(page, search_item.company_name)
+        company_url = await hh_parser.find_company_url(page, search_item.company_name)  # ищет ссылки
         if company_url:
             companies_from_search.append({"url": company_url, "name": search_item.company_name})
 
-    await page.close()
+    await page.close()  # завершение 1 этапа
 
-    combined_list = all_companies_from_industries + companies_from_search
+    # если в поиске присутствуют индустрии, то осуществляется парсинг только по индустрии
+    # реализованно из-за залипания парсера за предел в 30 секунд
+    if all_companies_from_industries:
+        combined_list = all_companies_from_industries
+        logging.info("START HH PARSING INDUSTRY")
+    else:
+        combined_list = companies_from_search
+        logging.info("START HH PARSING COMPANIES BY NAME")
 
     # Убираем дубликаты на основе URL
     seen = set()
@@ -494,7 +501,7 @@ async def run_parsers():
 
 
 def start_server():
-    uvicorn.run(app, host="0.0.0.0", port=3306)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
 
 
 app.include_router(router)
