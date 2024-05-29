@@ -670,7 +670,6 @@ cursor: pointer;
         </form>
         <div class="button-container">
             <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
-            <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
         </div>
 
         
@@ -753,7 +752,7 @@ cursor: pointer;
             <select name="selected_company">
                 {% for company in companies %}
                 <option value="{{ company.name }}"
-                        {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name
+                        {% if selected_company and company.name == selected_company %}selected{% endif %}>{{ company.name
                     }}
                 </option>
                 {% endfor %}
@@ -970,14 +969,7 @@ cursor: pointer;
 <script>
 
 function run_parser_hh_comp() {
-        fetch(`/digsearch/start-parsing-company-hh`, {
-            method: 'GET'
-        })
-            .then(response => response.json())
-    }
-
-    function run_parser_tv_comp() {
-        fetch(`/digsearch/start-parsing-company-tv`, {
+        fetch(`/digsearch/start-parsing-company`, {
             method: 'GET'
         })
             .then(response => response.json())
