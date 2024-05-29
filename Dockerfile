@@ -20,6 +20,12 @@ RUN mkdir -p ./tadv_parser
 COPY tadv_parser ./tadv_parser
 RUN mkdir -p ./templates
 COPY templates ./templates
+RUN mkdir -p ./json_data
+COPY json_data ./json_data
+RUN mkdir -p ./static
+COPY static ./static
+
+ENV PYTHONPATH="/app"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config default-libmysqlclient-dev build-essential python3-dev bash
