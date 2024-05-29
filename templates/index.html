@@ -178,6 +178,11 @@ h2 {
     background-color: #2F3349;
     border-right: 1px solid #424A74;
     overflow: hidden;
+
+}
+
+.options-left_disabled {
+    translate: -100px;
 }
 
 .options__title {
@@ -784,9 +789,13 @@ cursor: pointer;
             <form action="/digsearch/autocomplete4" method="post">
             <fieldset class="main__search-block">
                 <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
+                <div class="pagination__select">
+                    <div id="pagination__drop-drown" class="pagination__select__drop-down"></div>
+                </div>
                 <div id="autocomplete-list-4"></div>
                 <input class="date-form" type="date" placeholder="Период" value="">
                 <button class="search-btn" type="button" onclick="fetchData()">Найти</button>
+                
 
             </fieldset>
 
@@ -828,6 +837,133 @@ cursor: pointer;
             </div>
         </div>
         </div>
+    </section>
+    <section class="main__options-right options">
+        <h1 class="options__title">Парсер технологий компаний</h1>
+        <form action="/digsearch/toggle_parser" method="post">
+            <fieldset class="parser-status">
+                <a id="parser-status">Парсер остановлен</a>
+                <button id="parser-button" type="submit" class="btn start-stop">Запустить</button>
+                <span id="restart-icon" style="display: none;">⚠️</span>
+            </fieldset>
+            <fieldset class="parsing-depth">
+                <input class="parser-depth" type="text" name="parser-depth" placeholder="Глубина">
+            </fieldset>
+        </form>
+        <div class="button-container">
+            <button onclick="run_parser_hh_comp()" class="btn">Запустить парсинг компаний</button>
+            <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
+        </div>
+
+        
+        <h2>Список компаний</h2>
+        <form action="/digsearch/add_company" method="post">
+            <fieldset class="list-of-companies">
+                <input type="text" id="searchInput" autocomplete="off"
+                       name="company_name" class="search-input" placeholder="Введите название компании..">
+                <div id="autocomplete-list"></div>
+                <button type="submit" class="btn">Добавить</button>
+            </fieldset>
+        </form>
+        <ul id="company-list" class="setting__list">
+            {% for item in search_list %}
+            <li>
+                {{ item.company_name }}
+                {% set statuses = item.parser_statuses if item.parser_statuses is mapping else
+                item.parser_statuses|fromjson %}
+                {% for parser, status in statuses.items() %}
+                {% if status %}
+                <span class="parser-icon green-check">✅</span>
+                <span class="parser-names">{{ parser.upper() }}</span>
+                {% endif %}
+                {% endfor %}
+                {% if item.active_parsers_count > 0 %}
+                <span class="processing-icon">🔄</span>
+                <span class="parser-count">{{ item.active_parsers_count }}</span>
+                {% endif %}
+                <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Список отраслей</h2>
+        <form action="/digsearch/add_industry" method="post">
+            <fieldset class="list-of-companies">
+                <input type="text" class="search-input-3" id="searchInput-3" autocomplete="off" name="industry_name"
+                       placeholder="Введите название отрасли">
+                <div id="autocomplete-list-3"></div>
+                <button type="submit" class="btn">Добавить</button>
+            </fieldset>
+        </form>
+        <ul id="industry-list" class="setting__list">
+            {% for item in industry_list %}
+            <li class="setting__item">
+                <label class="setting__item_label label">
+                    <!-- <input class="label__checkbox visually-hidden" type="checkbox"> -->
+                    <span class="label__mask"></span>
+                    <span class="label__name">{{ item.name }}</span>
+                    <a class="delete" href="/digsearch/delete_industry/{{ item.id }}">Удалить</a>
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Список технологий</h2>
+        <form action="/digsearch/add_technology" method="post">
+            <fieldset class="list-of-companies">
+                <input type="text" name="technology_name" class="search-input-2" id="searchInput-2" autocomplete="off"
+                       placeholder="Введите название технологии">
+                <div id="autocomplete-list-2"></div>
+                <button type="submit" class="btn">Добавить</button>
+            </fieldset>
+        </form>
+        <ul id="technology-list" class="setting__list">
+            {% for tech in technologies %}
+            <li class="setting__item">
+                <label class="setting__item_label label">
+                    <!-- <input class="label__checkbox visually-hidden" type="checkbox"> -->
+                    <span class="label__mask"></span>
+                    <span class="label__name">{{ tech.name }}</span>
+                    <a class="delete" href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a>
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Компании с доступными технологиями</h2>
+        <form action="/digsearch/show_technologies" method="post">
+            <select name="selected_company">
+                {% for company in companies %}
+                <option value="{{ company.name }}"
+                        {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name
+                    }}
+                </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Отобразить">
+        </form>
+
+        {% if selected_company %}
+        <h2>Технологии для {{ selected_company }}</h2>
+        <table border="1">
+            <thead>
+            <tr>
+                <th>Название технологии</th>
+                <th>Дата</th>
+                <th>Источник</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for tech in company_technologies %}
+            <tr>
+                <td>{{ tech.technology }}</td>
+                <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
+                <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </section>
 </main>
 
@@ -1000,8 +1136,168 @@ function run_parser_hh_comp() {
         }
     });
 
+    class ItcCustomSelect {
+    static EL = 'itc-select';
+    static EL_SHOW = 'itc-select_show';
+    static EL_OPTION = 'itc-select__option';
+    static EL_OPTION_SELECTED = 'itc-select__option_selected';
+    static DATA = '[data-select]';
+    static DATA_TOGGLE = '[data-select="toggle"]';
+  
+    static template(params) {
+      const { name, options, targetValue } = params;
+      const items = [];
+      let selectedIndex = -1;
+      let selectedValue = '';
+      let selectedContent = 'Выберите из списка';
+      options.forEach((option, index) => {
+        let selectedClass = '';
+        if (option[0] === targetValue) {
+          selectedClass = ` ${this.EL_OPTION_SELECTED}`;
+          selectedIndex = index;
+          selectedValue = option[0];
+          selectedContent = option[1];
+        }
+        items.push(`<li class="itc-select__option${selectedClass}" data-select="option"
+          data-value="${option[0]}" data-index="${index}">${option[1]}</li>`);
+      });
+      return `<button type="button" class="itc-select__toggle" name="${name}"
+        value="${selectedValue}" data-select="toggle" data-index="${selectedIndex}">
+        ${selectedContent}</button><div class="itc-select__dropdown">
+        <ul class="itc-select__options">${items.join('')}</ul></div>`;
+    }
+  
+    static hideOpenSelect() {
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest(`.${this.EL}`)) {
+          const elsActive = document.querySelectorAll(`.${this.EL_SHOW}`);
+          elsActive.forEach((el) => {
+            el.classList.remove(this.EL_SHOW);
+          });
+        }
+      });
+    }
+    static create(target, params) {
+      this._el = typeof target === 'string' ? document.querySelector(target) : target;
+      if (this._el) {
+        return new this(target, params);
+      }
+      return null;
+    }
+    constructor(target, params) {
+      this._el = typeof target === 'string' ? document.querySelector(target) : target;
+      this._params = params || {};
+      this._onClickFn = this._onClick.bind(this);
+      if (this._params.options) {
+        this._el.innerHTML = this.constructor.template(this._params);
+        this._el.classList.add(this.constructor.EL);
+      }
+      this._elToggle = this._el.querySelector(this.constructor.DATA_TOGGLE);
+      this._el.addEventListener('click', this._onClickFn);
+    }
+  
+    _onClick(e) {
+      const { target } = e;
+      const type = target.closest(this.constructor.DATA).dataset.select;
+      if (type === 'toggle') {
+        this.toggle();
+      } else if (type === 'option') {
+        this._changeValue(target);
+      }
+    }
+  
+    _updateOption(el) {
+      const elOption = el.closest(`.${this.constructor.EL_OPTION}`);
+      const elOptionSel = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
+      if (elOptionSel) {
+        elOptionSel.classList.remove(this.constructor.EL_OPTION_SELECTED);
+      }
+      elOption.classList.add(this.constructor.EL_OPTION_SELECTED);
+      this._elToggle.textContent = elOption.textContent;
+      this._elToggle.value = elOption.dataset.value;
+      this._elToggle.dataset.index = elOption.dataset.index;
+      this._el.dispatchEvent(new CustomEvent('itc.select.change'));
+      this._params.onSelected ? this._params.onSelected(this, elOption) : null;
+      return elOption.dataset.value;
+    }
+  
+    _reset() {
+      const selected = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
+      if (selected) {
+        selected.classList.remove(this.constructor.EL_OPTION_SELECTED);
+      }
+      this._elToggle.textContent = 'Выберите из списка';
+      this._elToggle.value = '';
+      this._elToggle.dataset.index = '-1';
+      this._el.dispatchEvent(new CustomEvent('itc.select.change'));
+      this._params.onSelected ? this._params.onSelected(this, null) : null;
+      return '';
+    }
+  
+    _changeValue(el) {
+      if (el.classList.contains(this.constructor.EL_OPTION_SELECTED)) {
+        return;
+      }
+      this._updateOption(el);
+      this.hide();
+    }
+  
+    show() {
+      document.querySelectorAll(this.constructor.EL_SHOW)
+        .forEach((el) => {
+          el.classList.remove(this.constructor.EL_SHOW);
+        });
+      this._el.classList.add(`${this.constructor.EL_SHOW}`);
+    }
+  
+    hide() {
+      this._el.classList.remove(this.constructor.EL_SHOW);
+    }
+  
+    toggle() {
+      this._el.classList.contains(this.constructor.EL_SHOW) ? this.hide() : this.show();
+    }
+  
+    dispose() {
+      this._el.removeEventListener('click', this._onClickFn);
+    }
+  
+    get value() {
+      return this._elToggle.value;
+    }
+  
+    set value(value) {
+      let isExists = false;
+      this._el.querySelectorAll('.select__option')
+        .forEach((option) => {
+          if (option.dataset.value === value) {
+            isExists = true;
+            this._updateOption(option);
+          }
+        });
+      if (!isExists) {
+        this._reset();
+      }
+    }
+  
+    get selectedIndex() {
+      return this._elToggle.dataset.index;
+    }
+  
+    set selectedIndex(index) {
+      const option = this._el.querySelector(`.select__option[data-index="${index}"]`);
+      if (option) {
+        this._updateOption(option);
+      }
+      this._reset();
+    }
+  }
+
+  let selectedValue = 'hh';
+
 
     document.addEventListener("DOMContentLoaded", function () {
+        
         const eventSource = new EventSource('/digsearch/sse');
 
         eventSource.onmessage = function (event) {
@@ -1029,6 +1325,36 @@ function run_parser_hh_comp() {
         eventSource.onerror = function (error) {
             console.error("SSE failed:", error);
         };
+
+
+        ItcCustomSelect.create('#pagination__drop-drown', {
+    name: 'type',
+    targetValue: 'hh',
+    options: [
+      ['1', '1'],
+      ['hh', 'Hh'],
+      ['tv', 'Tv']
+    ],
+    onSelected(select, option) {
+      console.log(`Выбранное значение: ${select.value}`);
+      console.log(`Индекс выбранной опции: ${select.selectedIndex}`);
+      const text = option ? option.textContent : '';
+      console.log(`Выбранный текст опции: ${text}`);
+    },
+  });
+
+
+  document.querySelector('.itc-select').addEventListener('itc.select.change', (e) => {
+  const btn = e.target.querySelector('.itc-select__toggle');
+  selectedValue = btn.value;
+  console.log(`Выбранное значение: ${selectedValue}`);
+  console.log(`Выбранное значение: ${btn.value}`);
+  console.log(`Индекс выбранной опции: ${btn.dataset.index}`);
+  const selected = e.target.querySelector('.itc-select__option_selected');
+  const text = selected ? selected.textContent : '';
+  console.log(`Выбранный текст опции: ${text}`);
+  });
+
     });
 
     function updateCompanies(data) {
@@ -1107,8 +1433,9 @@ function run_parser_hh_comp() {
     // Данные из JSON для контента
 const tableContainer = document.querySelector('.table-container');
 
-let result = document.querySelector('.search-form');
-
+const result = document.querySelector('.search-form');
+const dateForm = document.querySelector('.date-form');
+const vacancyText = document.querySelector('.vacancy');
 
 async function fetchData() { 
     const response = await fetch(`/digsearch/vacancies?query=${result.value}`);
@@ -1170,9 +1497,68 @@ async function fetchData() {
         list.appendChild(parentTechnology);
         parentTechnology.textContent = vacancy.technology;
 
-        
     });
 }
+    } else {
+        vacancyText.textContent = 'Продукт';
+        for (const [companyName, companyData] of Object.entries(data)) {
+        const parentString = document.createElement('div');
+        console.log(companyName);
+        parentString.className = 'parent-string';
+        tableContainer.appendChild(parentString);
+        const listContainer = document.createElement('div');
+        listContainer.className = 'list-container';
+        parentString.insertAdjacentElement('afterEnd', listContainer);
+
+        const dropDown = document.createElement('span');
+        dropDown.className = 'drop-down';
+
+        const titleCompany = document.createElement('span');
+        titleCompany.className = 'title-company';
+        parentString.appendChild(dropDown);
+        parentString.appendChild(titleCompany);
+        titleCompany.textContent = companyName + ' (количество вакансий ' + companyData.passport.length + ')';
+
+        const next = parentString.nextElementSibling;
+        parentString.addEventListener('click', () => {
+            next.classList.toggle('close');
+        })
+
+    companyData.passport.forEach(vacancy => {
+        
+        const list = document.createElement('div');
+        list.className = 'list';
+        listContainer.appendChild(list);
+
+        const parentCompany = document.createElement('div');
+        parentCompany.className = 'parent-company';
+        list.appendChild(parentCompany);
+        parentCompany.textContent = companyName;
+
+        const parentVacancy = document.createElement('div');
+        parentVacancy.className = 'parent-vacancy';
+        list.appendChild(parentVacancy);
+        parentVacancy.textContent = vacancy.title;
+
+        const parentDate = document.createElement('div');
+        parentDate.className = 'parent-date';
+        list.appendChild(parentDate);
+        parentDate.textContent = vacancy.date;
+
+        const parentSource = document.createElement('div');
+        parentSource.className = 'parent-source';
+        list.appendChild(parentSource);
+        parentSource.textContent = vacancy.source;
+
+        const parentTechnology = document.createElement('div');
+        parentTechnology.className = 'parent-technology';
+        list.appendChild(parentTechnology);
+        parentTechnology.textContent = vacancy.technology;
+
+    });
+}
+    }
+    
 }
 
 document.addEventListener('click', function (event) {
@@ -1183,7 +1569,14 @@ document.addEventListener('click', function (event) {
             autocompleteList4.classList.add('autocomplete-list--disable')
         }
     });
-
+    
+result.addEventListener('keypress', () => {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        fetchData();
+        autocompleteList4.classList.add('autocomplete-list--disable');
+    }
+});
 
     const dateForm = document.querySelector('.date-form');
 
