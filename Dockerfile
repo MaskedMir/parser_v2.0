@@ -21,6 +21,8 @@ COPY tadv_parser ./tadv_parser
 RUN mkdir -p ./templates
 COPY templates ./templates
 
+ENV PYTHONPATH="/app"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         pkg-config default-libmysqlclient-dev build-essential python3-dev bash
 
