@@ -23,22 +23,20 @@ def company_tv_to_json(query: str, date: str = None):
     # Формирование списка словарей
     companies_dict = {}
     for company in names:
-        if query != '':
-            company_name = query
-        else:
-            company_name = company[0]
-        if company_name not in companies_dict:
-            companies_dict[company_name] = {
-                "passport": []
+        company_name = company[0]
+        if query.lower() == company_name.lower():
+            if company_name not in companies_dict:
+                companies_dict[company_name] = {
+                    "vacancies": []
+                }
+            passport_dict = {
+                "title": company[2],
+                "date": company[3].isoformat() if company[3] is not None else None,
+                "source": "TV; проекты",
+                "technology": company[4]
             }
-        passport_dict = {
-            "product": company[2],
-            "date": company[3].isoformat() if company[3] is not None else None,
-            "source": "TV; проекты",
-            "technology": company[4]
-        }
-        if date == passport_dict["date"]:
-            companies_dict[company_name]["passport"].append(passport_dict)
-        elif date is None:
-            companies_dict[company_name]["passport"].append(passport_dict)
+            if date == passport_dict["date"]:
+                companies_dict[company_name]["vacancies"].append(passport_dict)
+            elif date is None:
+                companies_dict[company_name]["vacancies"].append(passport_dict)
     return companies_dict
