@@ -983,7 +983,7 @@ cursor: pointer;
 <main class="main">
     <section class="main__options options-left">
         <h1 class="options__title">Парсер технологий компаний</h1>
-        <form action="/digsearch/toggle_parser" method="post">
+        <form class="parser-start" action="/digsearch/toggle_parser" method="post">
             <fieldset class="parser-status">
                 <a id="parser-status">Парсер остановлен</a>
                 <button id="parser-button" type="submit" class="btn start-stop">Запустить</button>
@@ -1106,7 +1106,7 @@ cursor: pointer;
     </section>
     <section class="main__options options-right">
         <h1 class="options__title">Парсер технологий компаний</h1>
-        <form action="/digsearch/toggle_parser" method="post">
+        <form class="parser-start-2" action="/digsearch/toggle_parser" method="post">
             <fieldset class="parser-status">
                 <a id="parser-status-2">Парсер остановлен</a>
                 <button id="parser-button-2" type="submit" class="btn start-stop">Запустить</button>
@@ -1931,10 +1931,43 @@ function pushDepth() {
 
 }
 
-const parserDepth = document.querySelector('.parser-depth');
-const parserDepth2 = document.querySelector('.parser-depth-2');
+// Глубина
 
+document.querySelector('.parser-start').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let parserDepth = document.querySelector('.parser-depth').value;
+        let url = `/digsearch/toggle_parser?query=${parserDepth}`;
+        
+        fetch(url, {
+            method: 'POST'
+        }).then(response => {
+            if(response.ok) {
+                console.log('Запрос успешно отправлен');
+            } else {
+                console.error('Произошла ошибка при отправке запроса');
+            }
+        }).catch(error => {
+            console.error('Произошла ошибка:', error);
+        });
+    });
 
+    document.querySelector('.parser-start-2').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let parserDepth = document.querySelector('.parser-depth-2').value;
+        let url = `/digsearch/toggle_parser?query=${parserDepth}`;
+        
+        fetch(url, {
+            method: 'POST'
+        }).then(response => {
+            if(response.ok) {
+                console.log('Запрос успешно отправлен');
+            } else {
+                console.error('Произошла ошибка при отправке запроса');
+            }
+        }).catch(error => {
+            console.error('Произошла ошибка:', error);
+        });
+    });
 
 // Модальное
 
