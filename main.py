@@ -182,7 +182,14 @@ async def toggle_parser(query: str):
         global should_restart
         should_restart = True
 
-    min_vac_count(int(query))
+
+    try:
+        query = int(query)
+    except ValueError:
+        query =  # Значение по умолчанию
+
+
+    min_vac_count(query)
 
     return RedirectResponse(url="/digsearch/", status_code=303)
 
