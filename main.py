@@ -237,11 +237,11 @@ async def autocomplete2(query: str):
 @router.get("/vacancies")
 async def get_vacancies(query: str, date: str = None, dtype: str = "hh"):  # список компаний с вакансиями
     date = f'{date}T00:00:00' if date else None    # = "2024-04-24T00:00:00"
-    if dtype == "tv":
-        _json = company_tv.company_tv_to_json(query, date)
-        return JSONResponse(content=_json)
-    elif dtype == "hh":
+    if dtype == "hh":
         _json = vacancy.vacancy_to_json(query, date)
+        return JSONResponse(content=_json)
+    elif dtype == "tv":
+        _json = company_tv.company_tv_to_json(query, date)
         return JSONResponse(content=_json)
     raise " switcher type does not exist "
 
