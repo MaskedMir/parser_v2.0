@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
+from peewee import DoesNotExist
 from playwright.async_api import async_playwright
 from starlette.responses import RedirectResponse, JSONResponse
 
@@ -126,13 +127,15 @@ async def add_technology(technology_name: str = Form(...)):
         for name in technology_names:
             if name:
                 try:
-                    # Проверка на существование технологии
-                    existing_technology = SearchTechnology.get(name=name)
-                    if not existing_technology:
-                        SearchTechnology.create(name=name)
-                        technology.create(technology=name)
-                except IntegrityError:
+                    SearchTechnology.get(name=name)
+                except DoesNotExist:
+                    SearchTechnology.create(name=name)
+                try:
+                    technology.get(technology=name)
                     continue
+                except DoesNotExist:
+                    technology.create(technology=name)
+
     return RedirectResponse(url="/digsearch/", status_code=303)
 
 
