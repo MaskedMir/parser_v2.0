@@ -8,7 +8,6 @@ def company_tv_to_json(query: str, date: str = None):
     cursor = conn.cursor()
     cursor.execute("SELECT "
                        "company.name, "
-                       "passport.integrator, "
                        "passport.product, "
                        "passport.updated_date, "
                        "passport.technology "
@@ -27,16 +26,16 @@ def company_tv_to_json(query: str, date: str = None):
         if query.lower() == company_name.lower() or query == "":
             if company_name not in companies_dict:
                 companies_dict[company_name] = {
-                    "vacancies": []
+                    "passport": []
                 }
             passport_dict = {
-                "title": company[2],
-                "date": company[3].isoformat() if company[3] is not None else None,
+                "product": company[1],
+                "date": company[2].isoformat() if company[2] is not None else None,
                 "source": "TV; проекты",
-                "technology": company[4]
+                "technology": company[3]
             }
             if date == passport_dict["date"]:
-                companies_dict[company_name]["vacancies"].append(passport_dict)
+                companies_dict[company_name]["passport"].append(passport_dict)
             elif date is None:
-                companies_dict[company_name]["vacancies"].append(passport_dict)
+                companies_dict[company_name]["passport"].append(passport_dict)
     return companies_dict
