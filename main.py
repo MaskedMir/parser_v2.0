@@ -8,22 +8,23 @@ import time
 from datetime import datetime
 
 import uvicorn
-from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, APIRouter, Request, Form, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from peewee import DoesNotExist
 from playwright.async_api import async_playwright
 from starlette.responses import RedirectResponse, JSONResponse
 
 from database import SearchCompany, Company, IntegrityError, SearchTechnology, Project, Passport, Vacancy, Resume, \
-    Industry, Product, db, technology, hhindustry
+    Industry, Product, db, technology
+from database.list_aggregator import list_arg
 from hh_parser import HeadHunterParser, main_parser_hh_comp
+from hh_parser.parser import min_vac_count
 from json_data import vacancy, company_tv
 from shared import should_stop
 from tadv_parser import TadViserParser, main_parser_tv_comp
-from hh_parser.parser import min_vac_count
-from database.list_aggregator import list_arg
+
 app = FastAPI()
 router = APIRouter(prefix="/digsearch")
 templates = Jinja2Templates(directory="templates")
@@ -173,7 +174,7 @@ def show_technologies(request: Request, selected_company: str = Form(...)):
 
 
 @router.post("/toggle_parser")
-async def toggle_parser(query: str = "5"):
+async def toggle_parser(query: str):
     global parser_running
     if parser_running:
         should_stop.set()
@@ -239,7 +240,7 @@ async def autocomplete2(query: str):
 
 @router.get("/vacancies")
 async def get_vacancies(query: str, date: str = None, dtype: str = "hh"):  # список компаний с вакансиями
-    date = f'{date}T00:00:00' if date else None    # = "2024-04-24T00:00:00"
+    date = f'{date}T00:00:00' if date else None  # = "2024-04-24T00:00:00"
     if dtype == "hh":
         _json = vacancy.vacancy_to_json(query, date)
         return JSONResponse(content=_json)
@@ -264,6 +265,7 @@ async def autocomplete2(query: str):
             return {"matches": [names]}
     except Exception as e:
         logging.info(e)
+
 
 @router.get("/start-parsing-company")
 def start_():
