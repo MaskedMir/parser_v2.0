@@ -9,11 +9,11 @@ variables:
 
 
 build:
-  image: docker:stable
+  image: planetra.gitlab.yandexcloud.net:5050/tech/docker:stable
   stage: build
   when: manual
   services:
-    - name: docker:stable-dind
+    - name: planetra.gitlab.yandexcloud.net:5050/tech/docker:stable-dind
       alias: docker
   before_script:
     - echo $PAT | docker login $REGISTRY -u $GITLAB_USER_LOGIN --password-stdin
@@ -29,7 +29,7 @@ build:
 
 
 deploy:
-  image: ubuntu:latest
+  image: planetra.gitlab.yandexcloud.net:5050/tech/ubuntu:latest
   stage: deploy
   needs: ["build"]
   # dependencies:
@@ -49,7 +49,7 @@ deploy:
 
 
 shutdown:
-  image: ubuntu:latest
+  image: planetra.gitlab.yandexcloud.net:5050/tech/ubuntu:latest
   stage: deploy
   when: manual
   before_script:
@@ -64,7 +64,7 @@ shutdown:
     - docker
 
 logs:
-  image: ubuntu:latest
+  image: planetra.gitlab.yandexcloud.net:5050/tech/ubuntu:latest
   stage: logs
   needs: ["build", "deploy"]
   # dependencies:
