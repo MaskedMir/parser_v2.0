@@ -910,28 +910,6 @@ cursor: pointer;
             {% endfor %}
         </ul>
 
-        <h2>Список отраслей</h2>
-        <form action="/digsearch/add_industry" method="post">
-            <fieldset class="list-of-companies">
-                <input type="text" class="search-input-3" id="searchInput-3" autocomplete="off" name="industry_name"
-                       placeholder="Введите название отрасли">
-                <div id="autocomplete-list-3"></div>
-                <button type="submit" class="btn">Добавить</button>
-            </fieldset>
-        </form>
-        <ul id="industry-list" class="setting__list">
-            {% for item in industry_list %}
-            <li class="setting__item">
-                <label class="setting__item_label label">
-                    <!-- <input class="label__checkbox visually-hidden" type="checkbox"> -->
-                    <span class="label__mask"></span>
-                    <span class="label__name">{{ item.name }}</span>
-                    <a class="delete" href="/digsearch/delete_industry/{{ item.id }}">Удалить</a>
-                </label>
-            </li>
-            {% endfor %}
-        </ul>
-
         <h2>Список технологий</h2>
         <form action="/digsearch/add_technology" method="post">
             <fieldset class="list-of-companies">
