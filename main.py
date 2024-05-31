@@ -186,7 +186,7 @@ async def toggle_parser(query: str):
     try:
         query = int(query)
     except ValueError:
-        query =  # Значение по умолчанию
+        query =  1
 
 
     min_vac_count(query)
