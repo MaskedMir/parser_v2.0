@@ -41,7 +41,3 @@ def vacancy_to_json(query: str = "", date: str = None):
             elif date is None:
                 companies_dict[company_name]["vacancies"].append(vacancy_dict)
     return companies_dict
-
-
-if __name__ == '__main__':
-    print(vacancy_to_json())

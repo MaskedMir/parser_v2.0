@@ -55,7 +55,3 @@ def company_tv_to_json(query: str = "", date: str = None):
             elif date == passport_dict["date"]:
                 companies_dict[company_name]["passport"].append(passport_dict)
     return companies_dict
-
-
-if __name__ == '__main__':
-    print(company_tv_to_json())
