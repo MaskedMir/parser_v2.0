@@ -6,8 +6,6 @@ import logging
 
 from database.database import HHCompList
 
-
-
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(asctime)s %(message)s")
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)\

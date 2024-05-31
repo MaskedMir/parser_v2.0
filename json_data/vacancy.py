@@ -3,15 +3,15 @@ from database.database import db
 
 
 # Выполнение запроса с JOIN
-def vacancy_to_json(query: str, date: str = None):
+def vacancy_to_json(query: str = "", date: str = None):
     conn = db
     cursor = conn.cursor()
     cursor.execute("SELECT "
                        "company.name, "
                        "vacancy.title, "
                        "vacancy.publication_date, "
-                       "vacancy.source, "
-                       "vacancy.technology "
+                       "vacancy.technology, "
+                       "vacancy.url "
                    "FROM "
                        "company "
                    "INNER JOIN "
@@ -32,8 +32,9 @@ def vacancy_to_json(query: str, date: str = None):
             vacancy_dict = {
                 "title": vacancy[1],
                 "date": vacancy[2].isoformat() if vacancy[2] is not None else None,
-                "source": vacancy[3],
-                "technology": vacancy[4]
+                "source": "HH",
+                "technology": vacancy[3],
+                "url": vacancy[4]
             }
             if date == vacancy_dict["date"]:
                 companies_dict[company_name]["vacancies"].append(vacancy_dict)
