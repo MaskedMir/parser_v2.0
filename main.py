@@ -238,7 +238,7 @@ async def autocomplete2(query: str):
 
 
 @router.get("/vacancies")
-async def get_vacancies(query: str, date: str = None, dtype: str = "hh"):  # список компаний с вакансиями
+async def get_vacancies(query: str = None, date: str = None, dtype: str = "hh"):  # список компаний с вакансиями
     date = f'{date}T00:00:00' if date else None    # = "2024-04-24T00:00:00"
     if dtype == "hh":
         _json = vacancy.vacancy_to_json(query, date)
