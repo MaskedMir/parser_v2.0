@@ -745,16 +745,19 @@ cursor: pointer;
 }
 
 .drop-down::before {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 100%;
     content: url("{{ url_for('static', path='/icon/drop-down.svg') }}");
     /* content: url(/static/icon/drop-down.svg); */
-    margin-right: 10px;
     transform: rotate(270deg);
 }
 
-/* .drop-down::before {
-    transform: rotate(0deg);
-} */
+.drop-down_active {
+    transform: rotate(90deg);
+}
 
 
 .list {
@@ -1876,6 +1879,7 @@ async function fetchData() {
         const next = parentString.nextElementSibling;
         parentString.addEventListener('click', () => {
             next.classList.toggle('close');
+            dropDown.classList.toggle('drop-down_active');
         })
 
     companyData.vacancies.forEach(vacancy => {
