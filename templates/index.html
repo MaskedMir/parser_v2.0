@@ -533,6 +533,7 @@ input {
 }
 
 .container {
+    min-width: 600px;
     padding: 16px 16px 16px 16px;
     border: 1px solid rgb(65, 73, 112);
     border-radius: 10px;
@@ -635,25 +636,10 @@ cursor: pointer;
 }
 
 
-.table-company {
-    width: 297px;
-    height: 40px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-    margin: 0px 0px;
-    border: 1px solid rgb(65, 73, 112);
-    background: rgb(56, 61, 86);
-    padding: 11px 16px;
 
-}
 
 .vacancy {
-    width: 260px;
+    flex-basis: 180px;
     height: 40px;
     display: flex;
     flex-direction: row;
@@ -662,7 +648,7 @@ cursor: pointer;
     padding: 0px 16px 0px 0px;
     flex: none;
     order: 0;
-    flex-grow: 0;
+    flex-grow: 1;
     margin: 0px 0px;
     border: 1px solid rgb(65, 73, 112);
     background: rgb(56, 61, 86);
@@ -670,8 +656,45 @@ cursor: pointer;
 
 }
 
-.date,
-.source,
+.parent-technology {
+    flex-basis: 180px;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    flex-grow: 1;
+}
+
+.date {
+    flex-basis: 160px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border: 1px solid rgb(65, 73, 112);
+    background: rgb(56, 61, 86);
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding: 11px 16px;
+}
+
+.source {
+    max-width: 160px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0px 16px 0px 0px;
+    flex: none;
+    order: 0;
+    margin: 0px 0px;
+    border: 1px solid rgb(65, 73, 112);
+    background: rgb(56, 61, 86);
+    flex-grow: 1;
+    padding: 11px 16px;
+}
+
 .technology {
     width: 169.67px;
     height: 40px;
@@ -689,12 +712,16 @@ cursor: pointer;
     padding: 11px 16px;
 }
 
+.technology_disable {
+    display: none;
+}
+
 .text {
     padding-left: 20px;
 }
 
 .parent-string {
-    height: 36px;
+    min-height: 36px;
     color: rgb(121, 133, 153);
     font-family: Roboto;
     font-size: 14px;
@@ -730,37 +757,88 @@ cursor: pointer;
    transition: height 1s ease;
 }
 
-
-.parent-company {
-    width: 297px;
+.table-company {
+    flex-basis: 300px;
+    height: 40px;
     display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     align-items: center;
-    padding-left: 56px;
-    box-sizing: border-box;
-/* Обводка */
-    /* border-bottom: 1px solid rgb(65, 73, 112); */
+    flex-grow: 0;
+    flex-shrink: 0;
+    border: 1px solid rgb(65, 73, 112);
+    background: rgb(56, 61, 86);
+    padding: 11px 16px;
 
 }
 
+.parent-company {
+    flex-basis: 300px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+/* Обводка */
+    /* border-bottom: 1px solid rgb(65, 73, 112); */
+}
+
+
 .parent-vacancy {
-    width: 260px;
+    width: 240px;
     display: flex;
     align-items: center;
     padding-left: 16px;
     /* border-bottom: 1px solid rgb(65, 73, 112); */
-
-
 }
 
-.parent-date,
-.parent-source,
+.name-link {
+    text-decoration: none;
+    color: #B8BFCC;
+}
+
+.name-link:hover {
+    color: white;
+}
+
+.parent-date {
+    flex-basis: 160px;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    flex-grow: 0;
+}
+.parent-source {
+    display: flex;
+    margin-right: 20px;
+    background-color: rgb(199, 50, 50);
+    min-width: 50px;
+    max-width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    color: #FFF;
+}
+
+.parent-source-tv {
+    display: flex;
+    margin-right: 20px;
+    background-color: rgb(255, 255, 255);
+    min-width: 50px;
+    max-width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    color: black;
+}
+
 .parent-technology {
     width: 169.67px;
     display: flex;
     align-items: center;
     padding-left: 16px;
     flex-grow: 1;
-    /* border-bottom: 1px solid rgb(65, 73, 112); */
 }
 
 
@@ -946,6 +1024,24 @@ cursor: pointer;
     position: relative;
 }
 
+.parsing-depth-center {
+    position: relative;
+    flex-grow: 1;
+}
+
+.parsing-depth-center::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    mask-image: url("{{ url_for('static', path='/icon/search.svg') }}");
+    background-color: #B8BFCC;
+    z-index: 2;
+    right: 8px;
+    top: 37%;
+    transform: translate(0, -50%);
+}
+
 .parsing-depth::before,
 .parsing-depth-2::before {
     content: "";
@@ -1071,22 +1167,7 @@ cursor: pointer;
             {% endfor %}
         </ul>
 
-            <h2>Компании с доступными технологиями</h2>
-        <form action="/digsearch/show_technologies" method="post">
-            <fieldset class="show-technologies-container">
-                <select class="show-technologies" name="selected_company">
-                    {% for company in companies %}
-                    <option class="show-technologies__option" value="{{ company.name }}"
-                            {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name
-                        }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <input class="btn trigger" type="submit" value="Отобразить">
-            </fieldset>
-        </form>
     </section>
-    <!-- Модальное -->
     
     <section class="main__content">
         <button class="left-button"><img src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
@@ -1095,7 +1176,9 @@ cursor: pointer;
             <!-- Добавить данные для отправки -->
             <form action="/digsearch/autocomplete4" method="post">
             <fieldset class="main__search-block">
-                <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
+                <div class="parsing-depth-center">
+                    <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
+                </div>
                 <div class="pagination__select">
                     <div id="pagination__drop-drown" class="pagination__select__drop-down"></div>
                 </div>
@@ -1108,13 +1191,13 @@ cursor: pointer;
             </form>
             <div class="main__table-title">
             <div class="table-company">
-                <span class="label__mask"></span>
-                <span class="text">Компания</span>
+                <!-- <span class="label__mask"></span> -->
+                <span class="text">Наименование</span>
             </div>
-            <div class="vacancy">Вакансия</div>
-            <div class="date">Дата публикации</div>
-            <div class="source">Тип</div>
-            <div class="technology">Технология</div>
+            <div class="vacancy">Технологии</div>
+            <div class="date">Дата</div>
+            <!-- <div class="source">Тип</div>
+            <div class="technology">Технология</div> -->
             </div>
             <div class="main__table-body">
             <div class="table-container">
@@ -1183,43 +1266,6 @@ cursor: pointer;
             </li>
             {% endfor %}
         </ul>
-
-            <h2>Компании с доступными технологиями</h2>
-        <form action="/digsearch/show_technologies" method="post">
-            <fieldset class="show-technologies-container">
-                <select class="show-technologies" name="selected_company">
-                    {% for company in companies %}
-                    <option class="show-technologies__option" value="{{ company.name }}"
-                            {% if selected_company and company.name== selected_company %}selected{% endif %}>{{ company.name
-                        }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <input class="btn trigger" type="submit" value="Отобразить">
-            </fieldset>
-        </form>
-        <!-- {% if selected_company %}
-        
-        <h2>Технологии для {{ selected_company }}</h2>
-        <table border="1">
-            <thead>
-            <tr>
-                <th>Название технологии</th>
-                <th>Дата</th>
-                <th>Источник</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for tech in company_technologies %}
-            <tr>
-                <td>{{ tech.technology }}</td>
-                <td>{{ tech.date.strftime('%Y-%m-%d') if tech.date else 'N/A' }}</td>
-                <td><a href="{{ tech.url }}">{{ (tech.url or 'N/A')|truncate(30, True, "...") }}</a></td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% endif %} -->
     </section>
 </main>
 
@@ -1662,7 +1708,6 @@ function validateFormTechnology() {
             }
 
             updateCompanies(data.company);
-            console.log(data)
         };
 
         eventSource.onerror = function (error) {
@@ -1775,28 +1820,32 @@ function validateFormTechnology() {
 
     // Данные из JSON для контента
 const tableContainer = document.querySelector('.table-container');
+const tableCompany = document.querySelector('.table-company');
+const parentCompany = document.querySelector('.parent-company');
+
 
 const result = document.querySelector('.search-form');
 const dateForm = document.querySelector('.date-form');
 const vacancyText = document.querySelector('.vacancy');
+const technology = document.querySelector('.technology');
+const source = document.querySelector('.source');
 
 async function fetchData() { 
     const response = await fetch(`/digsearch/vacancies?query=${result.value}&date=${dateForm.value}&dtype=${selectedValue}`);
-    // const response = await fetch('test.json');
+    // const response = await fetch('HH.json');
     const data = await response.json();
     console.log(dateForm.value);
     console.log(result.value);
     console.log(selectedValue);
     // tableContainer.textContent = '';
     if (selectedValue === 'hh') {
-        vacancyText.textContent = 'Вакансия';
         for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
         console.log(companyName);
         parentString.className = 'parent-string';
         tableContainer.appendChild(parentString);
         const listContainer = document.createElement('div');
-        listContainer.className = 'list-container';
+        listContainer.className = 'list-container close';
         parentString.insertAdjacentElement('afterEnd', listContainer);
 
         const dropDown = document.createElement('span');
@@ -1820,41 +1869,42 @@ async function fetchData() {
         listContainer.appendChild(list);
 
         const parentCompany = document.createElement('div');
-        parentCompany.className = 'parent-company';
-        list.appendChild(parentCompany);
-        parentCompany.textContent = companyName;
-
-        const parentVacancy = document.createElement('div');
-        parentVacancy.className = 'parent-vacancy';
-        list.appendChild(parentVacancy);
-        parentVacancy.textContent = vacancy.title;
-
-        const parentDate = document.createElement('div');
-        parentDate.className = 'parent-date';
-        list.appendChild(parentDate);
-        parentDate.textContent = vacancy.date;
-
         const parentSource = document.createElement('div');
+        const parentName = document.createElement('div');
+        const parentNameLink = document.createElement('a');
+        parentNameLink.className = 'name-link';
+        parentCompany.className = 'parent-company';
         parentSource.className = 'parent-source';
-        list.appendChild(parentSource);
+
+        list.appendChild(parentCompany);
+        parentCompany.appendChild(parentSource);
         parentSource.textContent = vacancy.source;
+        parentNameLink.textContent = vacancy.title;
+        parentNameLink.href = vacancy.url;
+        parentNameLink.target = 'blank';
+        parentName.appendChild(parentNameLink);
+        parentCompany.appendChild(parentName);
 
         const parentTechnology = document.createElement('div');
         parentTechnology.className = 'parent-technology';
         list.appendChild(parentTechnology);
         parentTechnology.textContent = vacancy.technology;
 
+        const parentDate = document.createElement('div');
+        parentDate.className = 'parent-date';
+        list.appendChild(parentDate);
+        parentDate.textContent = vacancy.date;
+
     });
 }
     } else {
-        vacancyText.textContent = 'Продукт';
         for (const [companyName, companyData] of Object.entries(data)) {
         const parentString = document.createElement('div');
         console.log(companyName);
         parentString.className = 'parent-string';
         tableContainer.appendChild(parentString);
         const listContainer = document.createElement('div');
-        listContainer.className = 'list-container';
+        listContainer.className = 'list-container close';
         parentString.insertAdjacentElement('afterEnd', listContainer);
 
         const dropDown = document.createElement('span');
@@ -1872,35 +1922,42 @@ async function fetchData() {
         })
 
     companyData.passport.forEach(vacancy => {
-        
         const list = document.createElement('div');
         list.className = 'list';
         listContainer.appendChild(list);
 
         const parentCompany = document.createElement('div');
+        const parentSource = document.createElement('div');
+        const parentName = document.createElement('div');
         parentCompany.className = 'parent-company';
-        list.appendChild(parentCompany);
-        parentCompany.textContent = companyName;
+        parentSource.className = 'parent-source-tv';
+        parentName.textContent = companyName;
 
-        const parentVacancy = document.createElement('div');
-        parentVacancy.className = 'parent-vacancy';
-        list.appendChild(parentVacancy);
-        parentVacancy.textContent = vacancy.product;
+        list.appendChild(parentCompany);
+        parentCompany.appendChild(parentSource);
+        parentSource.textContent = vacancy.source;
+        parentCompany.appendChild(parentName);
+
+        const parentTechnology = document.createElement('div');
+        const parentTechnologyLink = document.createElement('a');
+        parentTechnologyLink.className = 'name-link';
+        parentTechnology.className = 'parent-technology';
+        parentTechnology.appendChild(parentTechnologyLink)
+        list.appendChild(parentTechnology);
+        parentTechnologyLink.textContent = vacancy.technology;
+        parentTechnologyLink.href = vacancy.url;
+        parentTechnologyLink.target = 'blank';
 
         const parentDate = document.createElement('div');
         parentDate.className = 'parent-date';
         list.appendChild(parentDate);
         parentDate.textContent = vacancy.date;
+       
 
-        const parentSource = document.createElement('div');
-        parentSource.className = 'parent-source';
-        list.appendChild(parentSource);
-        parentSource.textContent = vacancy.source;
-
-        const parentTechnology = document.createElement('div');
-        parentTechnology.className = 'parent-technology';
-        list.appendChild(parentTechnology);
-        parentTechnology.textContent = vacancy.technology;
+        // const parentTechnology = document.createElement('div');
+        // parentTechnology.className = 'parent-technology';
+        // list.appendChild(parentTechnology);
+        // parentTechnology.textContent = vacancy.technology;
 
     });
 }
