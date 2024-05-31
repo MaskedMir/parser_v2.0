@@ -338,6 +338,7 @@ option {
 }
 
 
+
 .search-input-2 {
     width: 100%;
     border: 0;
@@ -941,6 +942,24 @@ cursor: pointer;
     position: relative;
 }
 
+.parsing-depth {
+    position: relative;
+}
+
+.parsing-depth::before,
+.parsing-depth-2::before {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    mask-image: url("{{ url_for('static', path='/icon/search.svg') }}");
+    background-color: #B8BFCC;
+    z-index: 2;
+    right: 8px;
+    top: 37%;
+    transform: translate(0, -50%);
+}
+
 
     </style>
     <meta charset="UTF-8">
@@ -1000,7 +1019,7 @@ cursor: pointer;
 
         
         <h2>Список компаний</h2>
-        <form action="/digsearch/add_company" method="post" onsubmit="return validateForm();">
+        <form action="/digsearch/add_company" method="post" onsubmit="return validateFormCompany();">
             <fieldset class="list-of-companies">
                 <input type="text" id="searchInput" autocomplete="off"
                        name="company_name" class="search-input" placeholder="Введите название компании..">
@@ -1009,13 +1028,14 @@ cursor: pointer;
             </fieldset>
         </form>
         <ul id="company-list" class="setting__list">
-            {% for item in search_list %}
+            <!-- {% for item in search_list %}
             <li>
                 {{ item.company_name }}
                 {% set statuses = item.parser_statuses if item.parser_statuses is mapping else
                 item.parser_statuses|fromjson %}
                 {% for parser, status in statuses.items() %}
                 {% if status %}
+                <input class="label__checkbox visually-hidden" type="checkbox">
                 <span class="parser-icon green-check">✅</span>
                 <span class="parser-names">{{ parser.upper() }}</span>
                 {% endif %}
@@ -1026,11 +1046,11 @@ cursor: pointer;
                 {% endif %}
                 <a href="/digsearch/delete_company/{{ item.id }}">Удалить</a>
             </li>
-            {% endfor %}
+            {% endfor %} -->
         </ul>
 
         <h2>Список технологий</h2>
-        <form action="/digsearch/add_technology" method="post" onsubmit="return validateForm();">
+        <form action="/digsearch/add_technology" method="post" onsubmit="return validateFormTechnology();">
             <fieldset class="list-of-companies">
                 <input type="text" name="technology_name" class="search-input-2" id="searchInput-2" autocomplete="off"
                        placeholder="Введите название технологии">
@@ -1122,7 +1142,7 @@ cursor: pointer;
         </div>
 
         <h2>Список отраслей</h2>
-        <form action="/digsearch/add_industry" method="post" onsubmit="return validateForm();">
+        <form action="/digsearch/add_industry" method="post" onsubmit="return validateFormRight();">
             <fieldset class="list-of-companies">
                 <input type="text" class="search-input-3" id="searchInput-3" autocomplete="off" name="industry_name"
                        placeholder="Введите название отрасли">
@@ -1144,7 +1164,7 @@ cursor: pointer;
         </ul>
 
         <h2>Список технологий</h2>
-        <form action="/digsearch/add_technology" method="post" onsubmit="return validateForm();">
+        <form action="/digsearch/add_technology" method="post" onsubmit="return validateFormIndustry();">
             <fieldset class="list-of-companies">
                 <input type="text" name="technology_name" class="search-input-2" id="searchInput-2-right" autocomplete="off"
                        placeholder="Введите название технологии">
@@ -1383,7 +1403,7 @@ function run_parser_hh_comp() {
             });
     });
 
-    function validateForm() {
+    function validateFormCompany() {
     var text = document.getElementById("searchInput").value;
     if (text.trim() == "") {
         alert("Введите текст!");
@@ -1391,7 +1411,37 @@ function run_parser_hh_comp() {
     } else {
         return true;
     }
-}
+};
+
+function validateFormRight() {
+    var text = document.getElementById("searchInput-3").value;
+    if (text.trim() == "") {
+        alert("Введите текст!");
+        return false;
+    } else {
+        return true;
+    }
+};
+
+function validateFormIndustry() {
+    var text = document.getElementById("searchInput-2-right").value;
+    if (text.trim() == "") {
+        alert("Введите текст!");
+        return false;
+    } else {
+        return true;
+    }
+};
+
+function validateFormCompanyTechnology() {
+    var text = document.getElementById("searchInput-2").value;
+    if (text.trim() == "") {
+        alert("Введите текст!");
+        return false;
+    } else {
+        return true;
+    }
+};
 
     document.addEventListener('click', function (event) {
         if (event.target.className !== 'search-input' &&
@@ -1612,6 +1662,7 @@ function run_parser_hh_comp() {
             }
 
             updateCompanies(data.company);
+            console.log(data)
         };
 
         eventSource.onerror = function (error) {
