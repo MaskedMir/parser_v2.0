@@ -30,11 +30,14 @@ def company_tv_to_json(query: str = "", date: str = None):
     conn.close()
     # Формирование списка словарей
     companies_dict = {}
-    passport_dict = {}
     technologies = search_technology()
     for company in names:
         company_name = company[0]
-        if company[1] not in technologies:
+        if not technologies:
+            pass
+        elif any(tech.lower() in company[1].lower() for tech in technologies):
+            pass
+        else:
             continue
         if query.lower() == company_name.lower() or query == "":
             if company_name not in companies_dict:
@@ -44,6 +47,7 @@ def company_tv_to_json(query: str = "", date: str = None):
             passport_dict = {
                 "technology": company[1],
                 "date": company[2].isoformat() if company[2] is not None else None,
+                "source": "TV",
                 "url": company[3]
             }
             if date is None:

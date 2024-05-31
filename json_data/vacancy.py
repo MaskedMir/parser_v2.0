@@ -10,8 +10,8 @@ def vacancy_to_json(query: str, date: str = None):
                        "company.name, "
                        "vacancy.title, "
                        "vacancy.publication_date, "
-                       "vacancy.source, "
                        "vacancy.technology "
+                       "vacancy.url"
                    "FROM "
                        "company "
                    "INNER JOIN "
@@ -33,7 +33,8 @@ def vacancy_to_json(query: str, date: str = None):
                 "title": vacancy[1],
                 "date": vacancy[2].isoformat() if vacancy[2] is not None else None,
                 "source": vacancy[3],
-                "technology": vacancy[4]
+                "technology": "HH",
+                "url": vacancy[5]
             }
             if date == vacancy_dict["date"]:
                 companies_dict[company_name]["vacancies"].append(vacancy_dict)
