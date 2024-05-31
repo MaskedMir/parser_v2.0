@@ -15,10 +15,10 @@ should_continue = True
 n = int
 def min_vac_count(query):
     global n
-    if query:
-        n = int(query)
+    if query < 0:
+        n = query*(-1)
     else:
-        n = 1
+        n = query
 
 def clean_url_string(s):
     s = s.replace(' ', '+')
