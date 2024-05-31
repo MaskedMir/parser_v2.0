@@ -229,6 +229,10 @@ option {
     cursor: pointer;
 }
 
+.left-button_active {
+    transform: rotate(180deg);
+}
+
 .left-button:hover {
     opacity: 1;
     transition: opacity .3s;
@@ -258,8 +262,12 @@ option {
 
 }
 
-.right-button img {
+.right-button-img {
     transform: rotate(180deg);
+}
+
+.right-button_active {
+    transform: rotate(360deg);
 }
 
 .right-button:hover {
@@ -732,14 +740,22 @@ cursor: pointer;
     padding: 10px 32px 10px;
     cursor: pointer;
     border-bottom: 2px dashed rgb(65, 73, 112);
+    display: flex;
     /* margin-bottom: 10px; */
 }
 
 .drop-down::before {
+    display: block;
     content: url("{{ url_for('static', path='/icon/drop-down.svg') }}");
     /* content: url(/static/icon/drop-down.svg); */
     margin-right: 10px;
+    transform: rotate(270deg);
 }
+
+/* .drop-down::before {
+    transform: rotate(0deg);
+} */
+
 
 .list {
     display: flex;
@@ -1170,7 +1186,7 @@ cursor: pointer;
     </section>
     
     <section class="main__content">
-        <button class="left-button"><img src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
+        <button class="left-button"><img class="left-button-img" src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
         <div class="container">
 
             <!-- Добавить данные для отправки -->
@@ -1205,7 +1221,7 @@ cursor: pointer;
         </div>
         
         </div>
-        <button class="right-button"><img src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
+        <button class="right-button"><img class="right-button-img" src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
     </section>
     <section class="main__options options-right">
         <h1 class="options__title">Парсер технологий компаний</h1>
@@ -1985,7 +2001,9 @@ result.addEventListener('keypress', () => {
 // Скрыть сайтбар
 
 const leftButton = document.querySelector('.left-button');
+const leftButtonImg = document.querySelector('.left-button-img');
 const rightButton = document.querySelector('.right-button');
+const rightButtonImg = document.querySelector('.right-button-img');
 const optionsLeft = document.querySelector('.options-left')
 const optionsRight = document.querySelector('.options-right');
 const main = document.querySelector('.main');
@@ -1996,20 +2014,26 @@ leftButton.addEventListener('click', ()=>{
         optionsLeft.classList.add('options_left-disable');
         main.classList.add('main_left-disable');
         leftDisable = true;
+        leftButtonImg.classList.add('left-button_active');
     } else if (leftDisable == false && rightDisable == true) {
         optionsLeft.classList.add('options_left-disable');
         main.classList.remove('main_right-disable');
         main.classList.add('main_all-disable');
         leftDisable = true;
+        leftButtonImg.classList.add('left-button_active');
     } else if (leftDisable == true && rightDisable == false) {
         optionsLeft.classList.remove('options_left-disable');
         main.classList.remove('main_left-disable');
         leftDisable = false;
+        leftButtonImg.classList.remove('left-button_active');
+
     } else {
         optionsLeft.classList.remove('options_left-disable');
         main.classList.remove('main_all-disable');
         main.classList.add('main_right-disable');
         leftDisable = false;
+        leftButtonImg.classList.remove('left-button_active');
+
     }
 });
 rightButton.addEventListener('click', ()=>{
@@ -2017,20 +2041,28 @@ rightButton.addEventListener('click', ()=>{
         optionsRight.classList.add('options_right-disable');
         main.classList.add('main_right-disable');
         rightDisable = true;
+        rightButtonImg.classList.add('right-button_active');
+
     } else if (leftDisable == true && rightDisable == false) {
         optionsRight.classList.add('options_right-disable');
         main.classList.remove('main_left-disable')
         main.classList.add('main_all-disable');
         rightDisable = true;
+        rightButtonImg.classList.add('right-button_active');
+
     } else if (leftDisable == false && rightDisable == true) {
         optionsRight.classList.remove('options_right-disable');
         main.classList.remove('main_right-disable');
         rightDisable = false;
+        rightButtonImg.classList.remove('right-button_active');
+
     } else {
         optionsRight.classList.remove('options_right-disable');
         main.classList.remove('main_all-disable');
         main.classList.add('main_left-disable');
         rightDisable = false;
+        rightButtonImg.classList.remove('right-button_active');
+
     }
     
 });
