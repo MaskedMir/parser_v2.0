@@ -1028,7 +1028,7 @@ cursor: pointer;
             <button onclick="run_parser_tv_comp()" class="btn">Запустить парсинг компаний</button>
         </div>
 
-        
+
         <h2>Список компаний</h2>
         <form action="/digsearch/add_company" method="post" onsubmit="return validateFormCompany();">
             <fieldset class="list-of-companies">
@@ -1073,7 +1073,7 @@ cursor: pointer;
             {% for tech in technologies %}
             <li class="setting__item">
                 <label class="setting__item_label label">
-                    <!-- <input class="label__checkbox visually-hidden" type="checkbox"> -->
+
                     <span class="label__mask"></span>
                     <span class="label__name">{{ tech.name }}</span>
                     <a class="delete" href="/digsearch/delete_technology/{{ tech.id }}">Удалить</a>
@@ -1105,33 +1105,32 @@ cursor: pointer;
 
             <!-- Добавить данные для отправки -->
             <form action="/digsearch/autocomplete4" method="post">
-            <fieldset class="main__search-block">
-                <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
-                <div class="pagination__select">
-                    <div id="pagination__drop-drown" class="pagination__select__drop-down"></div>
-                </div>
-                <div id="autocomplete-list-4"></div>
-                <input class="date-form" type="date" placeholder="Период" value="">
-                <button class="search-btn" type="button" onclick="fetchData()">Найти</button>
+                <fieldset class="main__search-block">
+                    <input class="search-form" type="text" name="" placeholder="Поиск" autocomplete="off">
+                    <div class="pagination__select">
+                        <div id="pagination__drop-drown" class="pagination__select__drop-down"></div>
+                    </div>
+                    <div id="autocomplete-list-4"></div>
+                    <input class="date-form" type="date" placeholder="Период" value="">
+                    <button class="search-btn" type="button" onclick="fetchData()">Найти</button>
 
-            </fieldset>
+                </fieldset>
 
             </form>
             <div class="main__table-title">
-            <div class="table-company">
-                <span class="label__mask"></span>
-                <span class="text">Компания</span>
-            </div>
-            <div class="vacancy">Вакансия</div>
-            <div class="date">Дата публикации</div>
-            <div class="source">Тип</div>
-            <div class="technology">Технология</div>
+                <div class="table-company">
+                    <span class="label__mask"></span>
+                    <span class="text">Компания</span>
+                </div>
+                <div class="vacancy">Вакансия</div>
+                <div class="date">Дата публикации</div>
+                <div class="source">Тип</div>
+                <div class="technology">Технология</div>
             </div>
             <div class="main__table-body">
             <div class="table-container">
             </div>
-        </div>
-        
+
         </div>
         <button class="right-button"><img src="{{ url_for('static', path='/icon/arrow-left.svg') }}" alt=""></button>
     </section>
@@ -1236,7 +1235,7 @@ cursor: pointer;
 
 <script>
 
-function run_parser_hh_comp() {
+    function run_parser_hh_comp() {
         fetch(`/digsearch/start-parsing-company-hh`, {
             method: 'GET'
         })
@@ -1372,8 +1371,8 @@ function run_parser_hh_comp() {
                 });
             });
     });
-    
-    
+
+
     document.addEventListener('click', function (event) {
         if (event.target.className !== 'search-input-3' &&
             event.target.type !== 'submit' &&
@@ -1503,146 +1502,172 @@ function validateFormTechnology() {
           selectedValue = option[0];
           selectedContent = option[1];
         }
-        items.push(`<li class="itc-select__option${selectedClass}" data-select="option"
+    });
+
+    class ItcCustomSelect {
+        static EL = 'itc-select';
+        static EL_SHOW = 'itc-select_show';
+        static EL_OPTION = 'itc-select__option';
+        static EL_OPTION_SELECTED = 'itc-select__option_selected';
+        static DATA = '[data-select]';
+        static DATA_TOGGLE = '[data-select="toggle"]';
+
+        static template(params) {
+            const {name, options, targetValue} = params;
+            const items = [];
+            let selectedIndex = -1;
+            let selectedValue = '';
+            let selectedContent = 'Выберите из списка';
+            options.forEach((option, index) => {
+                let selectedClass = '';
+                if (option[0] === targetValue) {
+                    selectedClass = ` ${this.EL_OPTION_SELECTED}`;
+                    selectedIndex = index;
+                    selectedValue = option[0];
+                    selectedContent = option[1];
+                }
+                items.push(`<li class="itc-select__option${selectedClass}" data-select="option"
           data-value="${option[0]}" data-index="${index}">${option[1]}</li>`);
-      });
-      return `<button type="button" class="itc-select__toggle" name="${name}"
+            });
+            return `<button type="button" class="itc-select__toggle" name="${name}"
         value="${selectedValue}" data-select="toggle" data-index="${selectedIndex}">
         ${selectedContent}</button><div class="itc-select__dropdown">
         <ul class="itc-select__options">${items.join('')}</ul></div>`;
-    }
-  
-    static hideOpenSelect() {
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest(`.${this.EL}`)) {
-          const elsActive = document.querySelectorAll(`.${this.EL_SHOW}`);
-          elsActive.forEach((el) => {
-            el.classList.remove(this.EL_SHOW);
-          });
         }
-      });
-    }
-    static create(target, params) {
-      this._el = typeof target === 'string' ? document.querySelector(target) : target;
-      if (this._el) {
-        return new this(target, params);
-      }
-      return null;
-    }
-    constructor(target, params) {
-      this._el = typeof target === 'string' ? document.querySelector(target) : target;
-      this._params = params || {};
-      this._onClickFn = this._onClick.bind(this);
-      if (this._params.options) {
-        this._el.innerHTML = this.constructor.template(this._params);
-        this._el.classList.add(this.constructor.EL);
-      }
-      this._elToggle = this._el.querySelector(this.constructor.DATA_TOGGLE);
-      this._el.addEventListener('click', this._onClickFn);
-    }
-  
-    _onClick(e) {
-      const { target } = e;
-      const type = target.closest(this.constructor.DATA).dataset.select;
-      if (type === 'toggle') {
-        this.toggle();
-      } else if (type === 'option') {
-        this._changeValue(target);
-      }
-    }
-  
-    _updateOption(el) {
-      const elOption = el.closest(`.${this.constructor.EL_OPTION}`);
-      const elOptionSel = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
-      if (elOptionSel) {
-        elOptionSel.classList.remove(this.constructor.EL_OPTION_SELECTED);
-      }
-      elOption.classList.add(this.constructor.EL_OPTION_SELECTED);
-      this._elToggle.textContent = elOption.textContent;
-      this._elToggle.value = elOption.dataset.value;
-      this._elToggle.dataset.index = elOption.dataset.index;
-      this._el.dispatchEvent(new CustomEvent('itc.select.change'));
-      this._params.onSelected ? this._params.onSelected(this, elOption) : null;
-      return elOption.dataset.value;
-    }
-  
-    _reset() {
-      const selected = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
-      if (selected) {
-        selected.classList.remove(this.constructor.EL_OPTION_SELECTED);
-      }
-      this._elToggle.textContent = 'Выберите из списка';
-      this._elToggle.value = '';
-      this._elToggle.dataset.index = '-1';
-      this._el.dispatchEvent(new CustomEvent('itc.select.change'));
-      this._params.onSelected ? this._params.onSelected(this, null) : null;
-      return '';
-    }
-  
-    _changeValue(el) {
-      if (el.classList.contains(this.constructor.EL_OPTION_SELECTED)) {
-        return;
-      }
-      this._updateOption(el);
-      this.hide();
-    }
-  
-    show() {
-      document.querySelectorAll(this.constructor.EL_SHOW)
-        .forEach((el) => {
-          el.classList.remove(this.constructor.EL_SHOW);
-        });
-      this._el.classList.add(`${this.constructor.EL_SHOW}`);
-    }
-  
-    hide() {
-      this._el.classList.remove(this.constructor.EL_SHOW);
-    }
-  
-    toggle() {
-      this._el.classList.contains(this.constructor.EL_SHOW) ? this.hide() : this.show();
-    }
-  
-    dispose() {
-      this._el.removeEventListener('click', this._onClickFn);
-    }
-  
-    get value() {
-      return this._elToggle.value;
-    }
-  
-    set value(value) {
-      let isExists = false;
-      this._el.querySelectorAll('.select__option')
-        .forEach((option) => {
-          if (option.dataset.value === value) {
-            isExists = true;
-            this._updateOption(option);
-          }
-        });
-      if (!isExists) {
-        this._reset();
-      }
-    }
-  
-    get selectedIndex() {
-      return this._elToggle.dataset.index;
-    }
-  
-    set selectedIndex(index) {
-      const option = this._el.querySelector(`.select__option[data-index="${index}"]`);
-      if (option) {
-        this._updateOption(option);
-      }
-      this._reset();
-    }
-  }
 
-  let selectedValue = 'hh';
+        static hideOpenSelect() {
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest(`.${this.EL}`)) {
+                    const elsActive = document.querySelectorAll(`.${this.EL_SHOW}`);
+                    elsActive.forEach((el) => {
+                        el.classList.remove(this.EL_SHOW);
+                    });
+                }
+            });
+        }
+
+        static create(target, params) {
+            this._el = typeof target === 'string' ? document.querySelector(target) : target;
+            if (this._el) {
+                return new this(target, params);
+            }
+            return null;
+        }
+
+        constructor(target, params) {
+            this._el = typeof target === 'string' ? document.querySelector(target) : target;
+            this._params = params || {};
+            this._onClickFn = this._onClick.bind(this);
+            if (this._params.options) {
+                this._el.innerHTML = this.constructor.template(this._params);
+                this._el.classList.add(this.constructor.EL);
+            }
+            this._elToggle = this._el.querySelector(this.constructor.DATA_TOGGLE);
+            this._el.addEventListener('click', this._onClickFn);
+        }
+
+        _onClick(e) {
+            const {target} = e;
+            const type = target.closest(this.constructor.DATA).dataset.select;
+            if (type === 'toggle') {
+                this.toggle();
+            } else if (type === 'option') {
+                this._changeValue(target);
+            }
+        }
+
+        _updateOption(el) {
+            const elOption = el.closest(`.${this.constructor.EL_OPTION}`);
+            const elOptionSel = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
+            if (elOptionSel) {
+                elOptionSel.classList.remove(this.constructor.EL_OPTION_SELECTED);
+            }
+            elOption.classList.add(this.constructor.EL_OPTION_SELECTED);
+            this._elToggle.textContent = elOption.textContent;
+            this._elToggle.value = elOption.dataset.value;
+            this._elToggle.dataset.index = elOption.dataset.index;
+            this._el.dispatchEvent(new CustomEvent('itc.select.change'));
+            this._params.onSelected ? this._params.onSelected(this, elOption) : null;
+            return elOption.dataset.value;
+        }
+
+        _reset() {
+            const selected = this._el.querySelector(`.${this.constructor.EL_OPTION_SELECTED}`);
+            if (selected) {
+                selected.classList.remove(this.constructor.EL_OPTION_SELECTED);
+            }
+            this._elToggle.textContent = 'Выберите из списка';
+            this._elToggle.value = '';
+            this._elToggle.dataset.index = '-1';
+            this._el.dispatchEvent(new CustomEvent('itc.select.change'));
+            this._params.onSelected ? this._params.onSelected(this, null) : null;
+            return '';
+        }
+
+        _changeValue(el) {
+            if (el.classList.contains(this.constructor.EL_OPTION_SELECTED)) {
+                return;
+            }
+            this._updateOption(el);
+            this.hide();
+        }
+
+        show() {
+            document.querySelectorAll(this.constructor.EL_SHOW)
+                .forEach((el) => {
+                    el.classList.remove(this.constructor.EL_SHOW);
+                });
+            this._el.classList.add(`${this.constructor.EL_SHOW}`);
+        }
+
+        hide() {
+            this._el.classList.remove(this.constructor.EL_SHOW);
+        }
+
+        toggle() {
+            this._el.classList.contains(this.constructor.EL_SHOW) ? this.hide() : this.show();
+        }
+
+        dispose() {
+            this._el.removeEventListener('click', this._onClickFn);
+        }
+
+        get value() {
+            return this._elToggle.value;
+        }
+
+        set value(value) {
+            let isExists = false;
+            this._el.querySelectorAll('.select__option')
+                .forEach((option) => {
+                    if (option.dataset.value === value) {
+                        isExists = true;
+                        this._updateOption(option);
+                    }
+                });
+            if (!isExists) {
+                this._reset();
+            }
+        }
+
+        get selectedIndex() {
+            return this._elToggle.dataset.index;
+        }
+
+        set selectedIndex(index) {
+            const option = this._el.querySelector(`.select__option[data-index="${index}"]`);
+            if (option) {
+                this._updateOption(option);
+            }
+            this._reset();
+        }
+    }
+
+    let selectedValue = 'hh';
 
 
     document.addEventListener("DOMContentLoaded", function () {
-        
+
         const eventSource = new EventSource('/digsearch/sse');
 
         eventSource.onmessage = function (event) {
@@ -1682,32 +1707,32 @@ function validateFormTechnology() {
 
 
         ItcCustomSelect.create('#pagination__drop-drown', {
-    name: 'type',
-    targetValue: 'hh',
-    options: [
-      ['1', '1'],
-      ['hh', 'Hh'],
-      ['tv', 'Tv']
-    ],
-    onSelected(select, option) {
-      console.log(`Выбранное значение: ${select.value}`);
-      console.log(`Индекс выбранной опции: ${select.selectedIndex}`);
-      const text = option ? option.textContent : '';
-      console.log(`Выбранный текст опции: ${text}`);
-    },
-  });
+            name: 'type',
+            targetValue: 'hh',
+            options: [
+                ['1', '1'],
+                ['hh', 'Hh'],
+                ['tv', 'Tv']
+            ],
+            onSelected(select, option) {
+                console.log(`Выбранное значение: ${select.value}`);
+                console.log(`Индекс выбранной опции: ${select.selectedIndex}`);
+                const text = option ? option.textContent : '';
+                console.log(`Выбранный текст опции: ${text}`);
+            },
+        });
 
 
-  document.querySelector('.itc-select').addEventListener('itc.select.change', (e) => {
-  const btn = e.target.querySelector('.itc-select__toggle');
-  selectedValue = btn.value;
-  console.log(`Выбранное значение: ${selectedValue}`);
-  console.log(`Выбранное значение: ${btn.value}`);
-  console.log(`Индекс выбранной опции: ${btn.dataset.index}`);
-  const selected = e.target.querySelector('.itc-select__option_selected');
-  const text = selected ? selected.textContent : '';
-  console.log(`Выбранный текст опции: ${text}`);
-  });
+        document.querySelector('.itc-select').addEventListener('itc.select.change', (e) => {
+            const btn = e.target.querySelector('.itc-select__toggle');
+            selectedValue = btn.value;
+            console.log(`Выбранное значение: ${selectedValue}`);
+            console.log(`Выбранное значение: ${btn.value}`);
+            console.log(`Индекс выбранной опции: ${btn.dataset.index}`);
+            const selected = e.target.querySelector('.itc-select__option_selected');
+            const text = selected ? selected.textContent : '';
+            console.log(`Выбранный текст опции: ${text}`);
+        });
 
     });
 
@@ -1770,22 +1795,22 @@ function validateFormTechnology() {
             label.appendChild(labelName);
             label.appendChild(deleteLink);
             label.addEventListener('click', () => {
-                const mask = label.querySelector('.label__mask'); 
+                const mask = label.querySelector('.label__mask');
                 mask.classList.toggle('label__mask_active');
             })
         });
     }
 
     const label = document.querySelectorAll('.label');
-    label.forEach((labelItem) => { 
+    label.forEach((labelItem) => {
         labelItem.addEventListener('click', (e) => {
-            const mask = labelItem.querySelector('.label__mask'); 
+            const mask = labelItem.querySelector('.label__mask');
             mask.classList.toggle('label__mask_active');
-             });
+        });
     });
 
     // Данные из JSON для контента
-const tableContainer = document.querySelector('.table-container');
+    const tableContainer = document.querySelector('.table-container');
 
 const result = document.querySelector('.search-form');
 const dateForm = document.querySelector('.date-form');
@@ -1793,69 +1818,64 @@ const vacancyText = document.querySelector('.vacancy');
 const technology = document.querySelector('.technology');
 const source = document.querySelector('.source');
 
-async function fetchData() { 
-    const response = await fetch(`/digsearch/vacancies?query=${result.value}&date=${dateForm.value}&dtype=${selectedValue}`);
-    // const response = await fetch('test.json');
-    const data = await response.json();
-    console.log(dateForm.value);
-    console.log(result.value);
-    console.log(selectedValue);
-    // tableContainer.textContent = '';
-    if (selectedValue === 'hh') {
-        vacancyText.textContent = 'Вакансия';
-        for (const [companyName, companyData] of Object.entries(data)) {
-        const parentString = document.createElement('div');
-        console.log(companyName);
-        parentString.className = 'parent-string';
-        tableContainer.appendChild(parentString);
-        const listContainer = document.createElement('div');
-        listContainer.className = 'list-container';
-        parentString.insertAdjacentElement('afterEnd', listContainer);
+    async function fetchData() {
+        const response = await fetch(`/digsearch/vacancies?query=${result.value}&date=${dateForm.value}&dtype=${selectedValue}`);
+        // const response = await fetch('test.json');
+        const data = await response.json();
+        console.log(dateForm.value);
+        console.log(result.value);
+        console.log(selectedValue);
+        // tableContainer.textContent = '';
+        if (selectedValue === 'hh') {
+            vacancyText.textContent = 'Вакансия';
+            for (const [companyName, companyData] of Object.entries(data)) {
+                const parentString = document.createElement('div');
+                console.log(companyName);
+                parentString.className = 'parent-string';
+                tableContainer.appendChild(parentString);
+                const listContainer = document.createElement('div');
+                listContainer.className = 'list-container';
+                parentString.insertAdjacentElement('afterEnd', listContainer);
 
-        const dropDown = document.createElement('span');
-        dropDown.className = 'drop-down';
+                const dropDown = document.createElement('span');
+                dropDown.className = 'drop-down';
 
-        const titleCompany = document.createElement('span');
-        titleCompany.className = 'title-company';
-        parentString.appendChild(dropDown);
-        parentString.appendChild(titleCompany);
-        titleCompany.textContent = companyName + ' (количество вакансий ' + companyData.vacancies.length + ')';
+                const titleCompany = document.createElement('span');
+                titleCompany.className = 'title-company';
+                parentString.appendChild(dropDown);
+                parentString.appendChild(titleCompany);
+                titleCompany.textContent = companyName + ' (количество вакансий ' + companyData.vacancies.length + ')';
 
-        const next = parentString.nextElementSibling;
-        parentString.addEventListener('click', () => {
-            next.classList.toggle('close');
-        })
+                const next = parentString.nextElementSibling;
+                parentString.addEventListener('click', () => {
+                    next.classList.toggle('close');
+                })
 
-    companyData.vacancies.forEach(vacancy => {
-        
-        const list = document.createElement('div');
-        list.className = 'list';
-        listContainer.appendChild(list);
+                companyData.vacancies.forEach(vacancy => {
 
-        const parentCompany = document.createElement('div');
-        parentCompany.className = 'parent-company';
-        list.appendChild(parentCompany);
-        parentCompany.textContent = companyName;
+                    const list = document.createElement('div');
+                    list.className = 'list';
+                    listContainer.appendChild(list);
 
-        const parentVacancy = document.createElement('div');
-        parentVacancy.className = 'parent-vacancy';
-        list.appendChild(parentVacancy);
-        parentVacancy.textContent = vacancy.title;
+                    const parentCompany = document.createElement('div');
+                    parentCompany.className = 'parent-company';
+                    list.appendChild(parentCompany);
+                    parentCompany.textContent = companyName;
 
-        const parentDate = document.createElement('div');
-        parentDate.className = 'parent-date';
-        list.appendChild(parentDate);
-        parentDate.textContent = vacancy.date;
+                    const parentVacancy = document.createElement('div');
+                    parentVacancy.className = 'parent-vacancy';
+                    list.appendChild(parentVacancy);
+                    parentVacancy.textContent = vacancy.title;
 
-        const parentSource = document.createElement('div');
-        parentSource.className = 'parent-source';
-        list.appendChild(parentSource);
-        parentSource.textContent = vacancy.source;
+                    const parentDate = document.createElement('div');
+                    parentDate.className = 'parent-date';
+                    list.appendChild(parentDate);
+                    parentDate.textContent = vacancy.date;
 
-        const parentTechnology = document.createElement('div');
-        parentTechnology.className = 'parent-technology';
-        list.appendChild(parentTechnology);
-        parentTechnology.textContent = vacancy.technology;
+                    const parentSource = document.createElement('div');
+                    parentSource.className = 'parent-source';
+                    list.appendChild(parentSource);
+                    parentSource.textContent = vacancy.source;
 
     });
 }
@@ -1872,8 +1892,18 @@ async function fetchData() {
         listContainer.className = 'list-container';
         parentString.insertAdjacentElement('afterEnd', listContainer);
 
-        const dropDown = document.createElement('span');
-        dropDown.className = 'drop-down';
+                });
+            }
+        } else {
+            vacancyText.textContent = 'Продукт';
+            for (const [companyName, companyData] of Object.entries(data)) {
+                const parentString = document.createElement('div');
+                console.log(companyName);
+                parentString.className = 'parent-string';
+                tableContainer.appendChild(parentString);
+                const listContainer = document.createElement('div');
+                listContainer.className = 'list-container';
+                parentString.insertAdjacentElement('afterEnd', listContainer);
 
         const titleCompany = document.createElement('span');
         titleCompany.className = 'title-company';
@@ -1881,31 +1911,28 @@ async function fetchData() {
         parentString.appendChild(titleCompany);
         titleCompany.textContent = companyName + ' (количество проектов ' + companyData.passport.length + ')';
 
-        const next = parentString.nextElementSibling;
-        parentString.addEventListener('click', () => {
-            next.classList.toggle('close');
-        })
+                const titleCompany = document.createElement('span');
+                titleCompany.className = 'title-company';
+                parentString.appendChild(dropDown);
+                parentString.appendChild(titleCompany);
+                titleCompany.textContent = companyName + ' (количество вакансий ' + companyData.passport.length + ')';
 
-    companyData.passport.forEach(vacancy => {
-        
-        const list = document.createElement('div');
-        list.className = 'list';
-        listContainer.appendChild(list);
+                const next = parentString.nextElementSibling;
+                parentString.addEventListener('click', () => {
+                    next.classList.toggle('close');
+                })
 
-        const parentCompany = document.createElement('div');
-        parentCompany.className = 'parent-company';
-        list.appendChild(parentCompany);
-        parentCompany.textContent = companyName;
+                companyData.passport.forEach(vacancy => {
 
         const parentVacancy = document.createElement('div');
         parentVacancy.className = 'parent-vacancy';
         list.appendChild(parentVacancy);
         parentVacancy.textContent = vacancy.technology;
 
-        const parentDate = document.createElement('div');
-        parentDate.className = 'parent-date';
-        list.appendChild(parentDate);
-        parentDate.textContent = vacancy.date;
+                    const parentCompany = document.createElement('div');
+                    parentCompany.className = 'parent-company';
+                    list.appendChild(parentCompany);
+                    parentCompany.textContent = companyName;
 
         const parentSource = document.createElement('div');
         parentSource.className = 'parent-source';
@@ -1917,13 +1944,9 @@ async function fetchData() {
         // list.appendChild(parentTechnology);
         // parentTechnology.textContent = vacancy.technology;
 
-    });
-}
     }
-    
-}
 
-document.addEventListener('click', function (event) {
+    document.addEventListener('click', function (event) {
         if (event.target.className !== 'search-form' &&
             event.target.type !== 'submit' &&
             event.target.className !== 'autocomplete-list__item'
@@ -1931,67 +1954,177 @@ document.addEventListener('click', function (event) {
             autocompleteList4.classList.add('autocomplete-list--disable')
         }
     });
-    
-result.addEventListener('keypress', () => {
-    if (event.keyCode === 13) {
+
+    result.addEventListener('keypress', () => {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            fetchData();
+            autocompleteList4.classList.add('autocomplete-list--disable');
+        }
+    });
+
+    // Скрыть сайтбар
+
+    const leftButton = document.querySelector('.left-button');
+    const rightButton = document.querySelector('.right-button');
+    const optionsLeft = document.querySelector('.options-left')
+    const optionsRight = document.querySelector('.options-right');
+    const main = document.querySelector('.main');
+    let leftDisable = false;
+    let rightDisable = false;
+    leftButton.addEventListener('click', () => {
+        if (leftDisable == false && rightDisable == false) {
+            optionsLeft.classList.add('options_left-disable');
+            main.classList.add('main_left-disable');
+            leftDisable = true;
+        } else if (leftDisable == false && rightDisable == true) {
+            optionsLeft.classList.add('options_left-disable');
+            main.classList.remove('main_right-disable');
+            main.classList.add('main_all-disable');
+            leftDisable = true;
+        } else if (leftDisable == true && rightDisable == false) {
+            optionsLeft.classList.remove('options_left-disable');
+            main.classList.remove('main_left-disable');
+            leftDisable = false;
+        } else {
+            optionsLeft.classList.remove('options_left-disable');
+            main.classList.remove('main_all-disable');
+            main.classList.add('main_right-disable');
+            leftDisable = false;
+        }
+    });
+    rightButton.addEventListener('click', () => {
+        if (leftDisable == false && rightDisable == false) {
+            optionsRight.classList.add('options_right-disable');
+            main.classList.add('main_right-disable');
+            rightDisable = true;
+        } else if (leftDisable == true && rightDisable == false) {
+            optionsRight.classList.add('options_right-disable');
+            main.classList.remove('main_left-disable')
+            main.classList.add('main_all-disable');
+            rightDisable = true;
+        } else if (leftDisable == false && rightDisable == true) {
+            optionsRight.classList.remove('options_right-disable');
+            main.classList.remove('main_right-disable');
+            rightDisable = false;
+        } else {
+            optionsRight.classList.remove('options_right-disable');
+            main.classList.remove('main_all-disable');
+            main.classList.add('main_left-disable');
+            rightDisable = false;
+        }
+
+    });
+
+    function pushDepth() {
+
+    }
+
+    // Глубина
+
+    document.querySelector('.parser-start').addEventListener('submit', function (event) {
         event.preventDefault();
-        fetchData();
-        autocompleteList4.classList.add('autocomplete-list--disable');
-    }
-});
+        let parserDepth = document.querySelector('.parser-depth').value;
+        let url = `/digsearch/toggle_parser?query=${parserDepth}`;
 
-// Скрыть сайтбар
+        fetch(url, {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                console.log('Запрос успешно отправлен');
+            } else {
+                console.error('Произошла ошибка при отправке запроса');
+            }
+        }).catch(error => {
+            console.error('Произошла ошибка:', error);
+        });
+    });
 
-const leftButton = document.querySelector('.left-button');
-const rightButton = document.querySelector('.right-button');
-const optionsLeft = document.querySelector('.options-left')
-const optionsRight = document.querySelector('.options-right');
-const main = document.querySelector('.main');
-let leftDisable = false;
-let rightDisable = false;
-leftButton.addEventListener('click', ()=>{
-    if (leftDisable == false && rightDisable == false) {
-        optionsLeft.classList.add('options_left-disable');
-        main.classList.add('main_left-disable');
-        leftDisable = true;
-    } else if (leftDisable == false && rightDisable == true) {
-        optionsLeft.classList.add('options_left-disable');
-        main.classList.remove('main_right-disable');
-        main.classList.add('main_all-disable');
-        leftDisable = true;
-    } else if (leftDisable == true && rightDisable == false) {
-        optionsLeft.classList.remove('options_left-disable');
-        main.classList.remove('main_left-disable');
-        leftDisable = false;
-    } else {
-        optionsLeft.classList.remove('options_left-disable');
-        main.classList.remove('main_all-disable');
-        main.classList.add('main_right-disable');
-        leftDisable = false;
+    document.querySelector('.parser-start-2').addEventListener('submit', function (event) {
+        event.preventDefault();
+        let parserDepth = document.querySelector('.parser-depth-2').value;
+        let url = `/digsearch/toggle_parser?query=${parserDepth}`;
+
+        fetch(url, {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                console.log('Запрос успешно отправлен');
+            } else {
+                console.error('Произошла ошибка при отправке запроса');
+            }
+        }).catch(error => {
+            console.error('Произошла ошибка:', error);
+        });
+    });
+
+    // Модальное
+
+    const modalTrigger = document.getElementsByClassName("trigger")[0];
+    const modalTrigger2 = document.getElementsByClassName("trigger")[1];
+
+    // получаем ширину отображенного содержимого и толщину ползунка прокрутки
+    const windowInnerWidth = document.documentElement.clientWidth;
+    const scrollbarWidth = parseInt(window.innerWidth) - parseInt(windowInnerWidth);
+
+    // привязываем необходимые элементы
+    const bodyElementHTML = document.getElementsByTagName("body")[0];
+    const modalBackground = document.getElementsByClassName("modalBackground")[0];
+    const modalClose = document.getElementsByClassName("modalClose")[0];
+    const modalActive = document.getElementsByClassName("modalActive")[0];
+
+    // функция для корректировки положения body при появлении ползунка прокрутки
+    function bodyMargin() {
+        bodyElementHTML.style.marginRight = "-" + scrollbarWidth + "px";
     }
-});
-rightButton.addEventListener('click', ()=>{
-    if (leftDisable == false && rightDisable == false) {
-        optionsRight.classList.add('options_right-disable');
-        main.classList.add('main_right-disable');
-        rightDisable = true;
-    } else if (leftDisable == true && rightDisable == false) {
-        optionsRight.classList.add('options_right-disable');
-        main.classList.remove('main_left-disable')
-        main.classList.add('main_all-disable');
-        rightDisable = true;
-    } else if (leftDisable == false && rightDisable == true) {
-        optionsRight.classList.remove('options_right-disable');
-        main.classList.remove('main_right-disable');
-        rightDisable = false;
-    } else {
-        optionsRight.classList.remove('options_right-disable');
-        main.classList.remove('main_all-disable');
-        main.classList.add('main_left-disable');
-        rightDisable = false;
-    }
-    
-});
+
+    // при длинной странице - корректируем сразу
+    bodyMargin();
+
+    // событие нажатия на триггер открытия модального окна
+    modalTrigger.addEventListener("click", function () {
+        // делаем модальное окно видимым
+        modalBackground.style.display = "block";
+
+        // если размер экрана больше 1366 пикселей (т.е. на мониторе может появиться ползунок)
+        if (windowInnerWidth >= 1366) {
+            bodyMargin();
+        }
+
+        // позиционируем наше окно по середине, где 175 - половина ширины модального окна
+        modalActive.style.left = "calc(50% - " + (175 - scrollbarWidth / 2) + "px)";
+    });
+
+    modalTrigger2.addEventListener("click", function () {
+        // делаем модальное окно видимым
+        modalBackground.style.display = "block";
+
+        // если размер экрана больше 1366 пикселей (т.е. на мониторе может появиться ползунок)
+        if (windowInnerWidth >= 1366) {
+            bodyMargin();
+        }
+
+        // позиционируем наше окно по середине, где 175 - половина ширины модального окна
+        modalActive.style.left = "calc(50% - " + (175 - scrollbarWidth / 2) + "px)";
+    });
+
+    // нажатие на крестик закрытия модального окна
+    modalClose.addEventListener("click", function () {
+        modalBackground.style.display = "none";
+        if (windowInnerWidth >= 1366) {
+            bodyMargin();
+        }
+    });
+
+    // закрытие модального окна на зону вне окна, т.е. на фон
+    modalBackground.addEventListener("click", function (event) {
+        if (event.target === modalBackground) {
+            modalBackground.style.display = "none";
+            if (windowInnerWidth >= 1366) {
+                bodyMargin();
+            }
+        }
+    });
 
 function pushDepth() {
 

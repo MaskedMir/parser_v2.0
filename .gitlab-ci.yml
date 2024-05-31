@@ -58,6 +58,7 @@ shutdown:
 logs:
   image: planetra.gitlab.yandexcloud.net:5050/tech/ubuntu:latest
   stage: logs
+  when: manual
   needs: ["build", "deploy"]
   before_script:
     - apt-get -yq update
